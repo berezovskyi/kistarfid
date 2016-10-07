@@ -80,9 +80,9 @@ void main(void) {
 					if(edge_time < 40) {
 						val |= 0x00;
 					} else if(edge_time < 80) {
-						val |= 0x80;
-					} else if(edge_time < 116) {
 						val |= 0x40;
+					} else if(edge_time < 116) {
+						val |= 0x80;
 					} else {
 						val |= 0xC0;
 					}
