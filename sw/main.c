@@ -1,73 +1,24 @@
-/******************************************************************************/
-/* Files to Include                                                           */
-/******************************************************************************/
-
-#if defined(__XC)
-	#include <xc.h>         /* XC8 General Include File */
-#elif defined(HI_TECH_C)
-	#include <htc.h>        /* HiTech General Include File */
-#endif
-
-#include <stdint.h>        /* For uint8_t definition */
+#include <xc.h>
+#include <stdint.h>
 #include <stdbool.h>
-#include <pic12f1612.h>       /* For true/false definition */
+#include <pic12f1612.h>
 
-// from system.h
-// TODO remove
-#define SYS_FREQ        500000L
-// TODO remove
-#define FCY             SYS_FREQ/4
+enum State {
+	STATE_IDLE,
+	STATE_SOF0,
+	STATE_SOF1,
+	STATE_BYTE0,
+	STATE_BYTE1,
+	STATE_BYTE2,
+	STATE_BYTE3,
+	STATE_DONE,
+};
+typedef enum State State;
 
-void init_oscillator() {
-	OSCCONbits.SCS = 0x00;
-	OSCCONbits.IRCF = 0x0D;
-
-	// wait until the ready state is reached
-	while(!OSCSTATbits.HFIOFR);
-}
-
-void init_vref() {
-	FVRCONbits.FVREN = true;
-	FVRCONbits.CDAFVR = 0x2; // 2x gain
-
-	// wait until the ready state is reached
-	while(!FVRCONbits.FVRRDY);
-}
-
-void init_dac() {
-	DAC1CON0bits.DAC1EN = true;
-	DAC1CON0bits.DAC1PSS = 0x2; // FVR
-	DAC1CON1 = 230; // FVR
-	DAC1CON0bits.DAC1OE = false;
-}
-
-void test_dac() {
-	// outputs DAC voltage to RA0
-	DAC1CON0bits.DAC1OE = true;
-}
-
-void init_comparator() {
-	CM1CON0bits.C1ON = true;
-	CM1CON0bits.C1POL = false;
-	CM1CON0bits.C1OUT = false;
-	CM1CON0bits.C1SP = true;
-	CM1CON0bits.C1HYS = false;
-	CM1CON0bits.C1SYNC = false;
-
-	CM1CON1bits.C1PCH = 0x01; // V_DAC
-
-	ANSELAbits.ANSA1 = true;
-	TRISAbits.TRISA1 = true;
-	CM1CON1bits.C1NCH = 0x00; // C1IN0 -> RA1
-}
-
-void enable_comparator_int() {
-	CM1CON1bits.C1INTN = true;
-	CM1CON1bits.C1INTP = true;
-}
-
-void main(void)
-{
+void main(void) {
+	State state = STATE_IDLE, state_next;
+	uint8_t val = 0;
+	
 	// set the frequency to 4MHz
 	init_oscillator();
 
@@ -79,21 +30,97 @@ void main(void)
 
 	// enable comparator from Vref via DAC (-) to RA1
 	init_comparator();
-
+	
 	// enable comparator interrupts
 	enable_comparator_int();
-
-//	test_dac();
-
+	
+	init_timer2();
+	
 	TRISA = 0xFE;
-	while(1)
-	{
-	// BUG: 'intr' will get cleared before the falling edge will be detected
-	unsigned char intr = PIR2bits.C1IF;
-	PORTAbits.RA0 = intr;
-		if(intr) {
-			// need to clear the interrupt fla
-			PIR2bits.C1IF = false;
+	
+	T2CONbits.ON = false;
+	TMR2 = 0x0;
+	PIR1bits.TMR2IF = false;
+	PIR2bits.C1IF = false;
+	for(;;) {
+		switch(state) {
+			case STATE_IDLE:
+				PORTAbits.RA0 = 0x0;
+				T2CONbits.ON = false;
+				if(PIR2bits.C1IF) {
+					PORTAbits.RA0 = 0x1;
+					TMR2 = 0x0;
+					T2CONbits.ON = true;
+					state = STATE_SOF0;
+					PIR2bits.C1IF = false;
+					state_next = STATE_IDLE;
+				}	
+				break;
+			case STATE_SOF0:
+				if(PIR1bits.TMR2IF) {
+					PIR1bits.TMR2IF = false;
+					PIR2bits.C1IF = false;
+					
+					PORTAbits.RA0 = 0x0;
+					PORTAbits.RA0 = 0x1;
+					PORTAbits.RA0 = 0x0;
+					PORTAbits.RA0 = 0x1;
+					
+					state = state_next;
+					state_next = STATE_IDLE;
+				}
+				if(PIR2bits.C1IF) {
+					if(TMR2 > 80 && TMR2 < 108) {
+						state_next = STATE_BYTE0;
+						PORTAbits.RA0 = 0x0;
+						PORTAbits.RA0 = 0x1;
+						val = 0;
+					} else {
+						state_next = STATE_IDLE;
+					}
+				}
+				break;
+			
+			case STATE_BYTE0:
+			case STATE_BYTE1:
+			case STATE_BYTE2:
+			case STATE_BYTE3:
+				if(PIR1bits.TMR2IF) {
+					PIR1bits.TMR2IF = false;
+					PIR2bits.C1IF = false;
+					state = state_next;
+					state_next = STATE_IDLE;
+					PORTAbits.RA0 = 0x0;
+					PORTAbits.RA0 = 0x1;
+				}
+				if(PIR2bits.C1IF) {
+					state_next = state + 1;
+					
+					val >>= 2;
+					
+					if(TMR2 < 30) {
+						val |= 0x00;
+					} else if(TMR2 < 67) {
+						val |= 0x40;
+					} else if(TMR2 < 105) {
+						val |= 0x80;
+					} else {
+						val |= 0xC0;
+					}
+				}
+				break;
+			
+			case STATE_DONE:
+				PORTAbits.RA0 = 0x1;
+				PORTAbits.RA0 = 0x0;
+				PORTAbits.RA0 = 0x1;
+				PORTAbits.RA0 = 0x0;
+				PORTAbits.RA0 = 0x1;
+				PORTAbits.RA0 = 0x0;
+				PORTAbits.RA0 = 0x1;
+				
+				state = STATE_IDLE;
+				break;
 		}
 	}
 }

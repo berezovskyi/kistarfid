@@ -11,6 +11,7 @@
       <itemPath>configuration_bits.c</itemPath>
       <itemPath>interrupts.c</itemPath>
       <itemPath>main.c</itemPath>
+      <itemPath>init.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -31,8 +32,8 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
-        <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <languageToolchainVersion></languageToolchainVersion>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -43,7 +44,7 @@
         </archiverTool>
         <loading>
           <useAlternateLoadableFile>false</useAlternateLoadableFile>
-          <parseOnProdLoad>false</parseOnProdLoad>
+          <parseOnProdLoad>true</parseOnProdLoad>
           <alternateLoadableFile></alternateLoadableFile>
         </loading>
       </compileType>
@@ -113,7 +114,7 @@
         <property key="format-hex-file-for-download" value="false"/>
         <property key="initialize-data" value="true"/>
         <property key="keep-generated-startup.as" value="false"/>
-        <property key="link-in-c-library" value="true"/>
+        <property key="link-in-c-library" value="false"/>
         <property key="link-in-peripheral-library" value="false"/>
         <property key="managed-stack" value="false"/>
         <property key="opt-xc8-linker-file" value="false"/>
@@ -128,7 +129,6 @@
         <property key="ToolFirmwareFilePath"
                   value="Press to browse for a specific firmware version"/>
         <property key="ToolFirmwareOption.UseLatestFirmware" value="true"/>
-        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>
@@ -167,7 +167,7 @@
         <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
-        <property key="voltagevalue" value="3.0"/>
+        <property key="voltagevalue" value="2.75"/>
       </PICkit3PlatformTool>
       <Simulator>
         <property key="codecoverage.enabled" value="Disable"/>
@@ -493,7 +493,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -833,7 +833,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -1246,7 +1246,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -1586,7 +1586,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -1999,7 +1999,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -2339,7 +2339,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -2752,7 +2752,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -3165,7 +3165,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
