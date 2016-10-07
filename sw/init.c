@@ -5,7 +5,7 @@
 
 void init_oscillator() {
 	OSCCONbits.SCS = 0x00;
-	OSCCONbits.IRCF = 0x0D;
+	OSCCONbits.IRCF = 0x0E;
 
 	// wait until the ready state is reached
 	while(!OSCSTATbits.HFIOFR);

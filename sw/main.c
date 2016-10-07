@@ -5,8 +5,6 @@
 
 enum State {
 	STATE_IDLE,
-	STATE_SOF0,
-	STATE_SOF1,
 	STATE_BYTE0,
 	STATE_BYTE1,
 	STATE_BYTE2,
@@ -15,8 +13,10 @@ enum State {
 };
 typedef enum State State;
 
+uint8_t edge_time = 0;
+
 void main(void) {
-	State state = STATE_IDLE, state_next;
+	State state = STATE_IDLE;
 	uint8_t val = 0;
 	
 	// set the frequency to 4MHz
@@ -42,41 +42,27 @@ void main(void) {
 	TMR2 = 0x0;
 	PIR1bits.TMR2IF = false;
 	PIR2bits.C1IF = false;
+	
+	PIE2bits.C1IE = true;
+	
+	INTCONbits.PEIE = true;
+	INTCONbits.GIE = true;
+	
 	for(;;) {
 		switch(state) {
-			case STATE_IDLE:
-				PORTAbits.RA0 = 0x0;
-				T2CONbits.ON = false;
-				if(PIR2bits.C1IF) {
-					PORTAbits.RA0 = 0x1;
-					TMR2 = 0x0;
-					T2CONbits.ON = true;
-					state = STATE_SOF0;
-					PIR2bits.C1IF = false;
-					state_next = STATE_IDLE;
-				}	
-				break;
-			case STATE_SOF0:
+			case STATE_IDLE:	
 				if(PIR1bits.TMR2IF) {
 					PIR1bits.TMR2IF = false;
-					PIR2bits.C1IF = false;
 					
-					PORTAbits.RA0 = 0x0;
-					PORTAbits.RA0 = 0x1;
-					PORTAbits.RA0 = 0x0;
-					PORTAbits.RA0 = 0x1;
-					
-					state = state_next;
-					state_next = STATE_IDLE;
-				}
-				if(PIR2bits.C1IF) {
-					if(TMR2 > 80 && TMR2 < 108) {
-						state_next = STATE_BYTE0;
-						PORTAbits.RA0 = 0x0;
-						PORTAbits.RA0 = 0x1;
+					if(edge_time > 80 && edge_time < 108) {
+						state = STATE_BYTE0;
 						val = 0;
+						PORTAbits.RA0 = true;
+						PORTAbits.RA0 = false;
 					} else {
-						state_next = STATE_IDLE;
+						state = STATE_IDLE;
+						T2CONbits.ON = false;
+						TMR2 = 0x0;
 					}
 				}
 				break;
@@ -87,39 +73,39 @@ void main(void) {
 			case STATE_BYTE3:
 				if(PIR1bits.TMR2IF) {
 					PIR1bits.TMR2IF = false;
-					PIR2bits.C1IF = false;
-					state = state_next;
-					state_next = STATE_IDLE;
-					PORTAbits.RA0 = 0x0;
-					PORTAbits.RA0 = 0x1;
-				}
-				if(PIR2bits.C1IF) {
-					state_next = state + 1;
+					state = state + 1;
 					
 					val >>= 2;
 					
-					if(TMR2 < 30) {
+					if(edge_time < 40) {
 						val |= 0x00;
-					} else if(TMR2 < 67) {
-						val |= 0x40;
-					} else if(TMR2 < 105) {
+					} else if(edge_time < 80) {
 						val |= 0x80;
+					} else if(edge_time < 116) {
+						val |= 0x40;
 					} else {
 						val |= 0xC0;
 					}
+					
+					PORTAbits.RA0 = true;
+					PORTAbits.RA0 = false;
 				}
 				break;
 			
 			case STATE_DONE:
 				PORTAbits.RA0 = 0x1;
 				PORTAbits.RA0 = 0x0;
-				PORTAbits.RA0 = 0x1;
-				PORTAbits.RA0 = 0x0;
-				PORTAbits.RA0 = 0x1;
-				PORTAbits.RA0 = 0x0;
-				PORTAbits.RA0 = 0x1;
+				for(uint8_t i = 0; i < 8; i++) {
+					PORTAbits.RA0 = 0x1;
+					PORTAbits.RA0 = 0x0;
+					PORTAbits.RA0 = val & 0x1;
+					val >>= 1;
+					PORTAbits.RA0 = false;
+				}
 				
 				state = STATE_IDLE;
+				T2CONbits.ON = false;
+				TMR2 = 0x0;
 				break;
 		}
 	}
