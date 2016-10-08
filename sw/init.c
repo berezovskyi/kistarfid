@@ -56,6 +56,6 @@ void init_timer2() {
 	T2CONbits.CKPS = 0x3;
 	T2CONbits.OUTPS = 0x0;
 	T2HLTbits.MODE = 0x0;
-	PR2 = 150;
+	PR2 = 149;
 	
 }

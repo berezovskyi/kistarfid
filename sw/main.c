@@ -9,15 +9,18 @@ enum State {
 	STATE_BYTE1,
 	STATE_BYTE2,
 	STATE_BYTE3,
+	STATE_NEXT_BYTE,
 	STATE_DONE,
 };
 typedef enum State State;
 
-uint8_t edge_time = 0;
+uint8_t edge_time = 0xFF;
+uint8_t packet[24];
 
 void main(void) {
-	State state = STATE_IDLE;
-	uint8_t val = 0;
+	static State state = STATE_IDLE;
+	static uint8_t val = 0;
+	static uint8_t i = 0;
 	
 	// set the frequency to 4MHz
 	init_oscillator();
@@ -57,13 +60,14 @@ void main(void) {
 					if(edge_time > 80 && edge_time < 108) {
 						state = STATE_BYTE0;
 						val = 0;
-						PORTAbits.RA0 = true;
-						PORTAbits.RA0 = false;
+						i = 0;
 					} else {
 						state = STATE_IDLE;
 						T2CONbits.ON = false;
 						TMR2 = 0x0;
 					}
+					
+					edge_time = 0xFF;
 				}
 				break;
 			
@@ -77,7 +81,9 @@ void main(void) {
 					
 					val >>= 2;
 					
-					if(edge_time < 40) {
+					if(edge_time == 0xFF) {
+						state = STATE_DONE;
+					} if(edge_time < 40) {
 						val |= 0x00;
 					} else if(edge_time < 80) {
 						val |= 0x40;
@@ -87,9 +93,15 @@ void main(void) {
 						val |= 0xC0;
 					}
 					
-					PORTAbits.RA0 = true;
-					PORTAbits.RA0 = false;
+					
+					edge_time = 0xFF;
 				}
+				break;
+			
+			case STATE_NEXT_BYTE:
+				packet[i++] = val;
+				val = 0x0;
+				state = STATE_BYTE0;
 				break;
 			
 			case STATE_DONE:
