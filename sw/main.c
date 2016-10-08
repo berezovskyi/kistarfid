@@ -105,18 +105,20 @@ void main(void) {
 				break;
 			
 			case STATE_DONE:
-				PORTAbits.RA0 = 0x1;
-				PORTAbits.RA0 = 0x0;
-				for(uint8_t i = 0; i < 8; i++) {
-					PORTAbits.RA0 = 0x1;
-					PORTAbits.RA0 = 0x0;
-					PORTAbits.RA0 = val & 0x1;
-					val >>= 1;
+				T2CONbits.ON = false;
+				for(uint8_t j = 0; j <= i; j++) {
+					uint8_t k, l;
+					for(k = 0; k < 8; k++) {
+						PORTAbits.RA0 = (packet[j] >> (7 - k)) ^ 0x1;
+						for(l = 0; l < 2; l++);
+						PORTAbits.RA0 = (packet[j] >> (7 - k)) ^ 0x0;
+						for(l = 0; l < 2; l++);
+					}
 					PORTAbits.RA0 = false;
+					for(k = 0; k < 20; k++);
 				}
 				
 				state = STATE_IDLE;
-				T2CONbits.ON = false;
 				TMR2 = 0x0;
 				break;
 		}
