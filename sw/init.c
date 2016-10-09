@@ -64,8 +64,8 @@ void init_ccp() {
 	T1CONbits.T1CKPS = 0x0;
 	T1CONbits.nT1SYNC = false;
 	
-	TMR1H = 0xFF;
-	TMR1L = 0xFF;
+	TMR1H = 0x0;
+	TMR1L = 0x1;
 	
 	T1CONbits.TMR1ON = false;
 	T1GCONbits.TMR1GE = false;

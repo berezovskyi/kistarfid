@@ -28,9 +28,73 @@ void test_cwg() {
 
 void mod_start() {
 	OSCTUNE = -32;
+	
+	TMR4 = 0;
+	CCPR2L = 7;
+	CCP2CONbits.EN = true;
+	T1CONbits.TMR1ON = true;
+	
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCPR2L = 8;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCPR2L = 7;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCPR2L = 8;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCP2CONbits.EN = false;
+	T1CONbits.TMR1ON = false;
+	TMR1 = 0;
 }
 
 void mod_end() {
+	TMR4 = 0;
+	CCP2CONbits.EN = true;
+	T1CONbits.TMR1ON = true;
+	
+	CCPR2L = 8;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCPR2L = 7;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCPR2L = 8;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCPR2L = 7;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	
+	CCP2CONbits.EN = false;
+	T1CONbits.TMR1ON = false;
+	TMR1 = 0;
+	
 	OSCTUNE = 0;
 }
 
@@ -89,6 +153,11 @@ void main(void) {
 	init_ccp();
 	
 	TRISA = 0xFE;
+	
+	for(;;) {
+		mod_start();
+		for(i = 0; i < 100; i++);
+	}
 	
 	T2CONbits.ON = false;
 	TMR2 = 0x0;
