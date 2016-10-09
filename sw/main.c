@@ -223,7 +223,7 @@ void main(void) {
 				T2CONbits.ON = false;
 				
 				mod_start();
-				mod_byte(packet[0]); //flags
+				mod_byte(0x0); //flags
 				mod_byte(0x0); //dfsid
 				mod_byte(0xDE);
 				mod_byte(0xAD);
