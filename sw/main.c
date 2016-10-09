@@ -17,15 +17,6 @@ typedef enum State State;
 uint8_t edge_time = 0xFF;
 uint8_t packet[24];
 
-void test_cwg() {
-	PR4 = 33;
-	T4CONbits.ON = true;
-	for(uint8_t j = 0; j < 10; j++);
-	PR4 = 38;
-	for(uint8_t j = 0; j < 10; j++);
-	T4CONbits.ON = false;
-}
-
 void mod_start() {
 	OSCTUNE = -32;
 	
@@ -128,6 +119,17 @@ void mod_0() {
 	TMR1 = 0;
 }
 
+void mod_byte(uint8_t byte) {
+	for(uint8_t j = 0; j < 8; j++) {
+		if(byte & 0x1)
+			mod_1();
+		else
+			mod_0();
+		
+		byte >>= 1;
+	}
+}
+
 void main(void) {
 	static State state = STATE_IDLE;
 	static uint8_t val = 0;
@@ -153,11 +155,6 @@ void main(void) {
 	init_ccp();
 	
 	TRISA = 0xFE;
-	
-	for(;;) {
-		mod_start();
-		for(i = 0; i < 100; i++);
-	}
 	
 	T2CONbits.ON = false;
 	TMR2 = 0x0;
@@ -224,17 +221,21 @@ void main(void) {
 			
 			case STATE_DONE:
 				T2CONbits.ON = false;
-				for(uint8_t j = 0; j <= i; j++) {
-					uint8_t k, l;
-					for(k = 0; k < 8; k++) {
-						PORTAbits.RA0 = (packet[j] >> (7 - k)) ^ 0x1;
-						for(l = 0; l < 2; l++);
-						PORTAbits.RA0 = (packet[j] >> (7 - k)) ^ 0x0;
-						for(l = 0; l < 2; l++);
-					}
-					PORTAbits.RA0 = false;
-					for(k = 0; k < 20; k++);
-				}
+				
+				mod_start();
+				mod_byte(packet[0]); //flags
+				mod_byte(0x0); //dfsid
+				mod_byte(0xDE);
+				mod_byte(0xAD);
+				mod_byte(0xBE);
+				mod_byte(0xEF);
+				mod_byte(0xCA);
+				mod_byte(0xFE);
+				mod_byte(0xBA);
+				mod_byte(0xBE);
+				mod_byte(0x00); //crc
+				mod_byte(0x00); //crc
+				mod_end();
 				
 				state = STATE_IDLE;
 				TMR2 = 0x0;
