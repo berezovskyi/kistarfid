@@ -26,6 +26,44 @@ void test_cwg() {
 	T4CONbits.ON = false;
 }
 
+void mod_start() {
+	OSCTUNE = -32;
+}
+
+void mod_end() {
+	OSCTUNE = 0;
+}
+
+void mod_1() {
+	TMR4 = 0;
+	CCPR2L = 7;
+	CCP2CONbits.EN = true;
+	T1CONbits.TMR1ON = true;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	CCPR2L = 8;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	CCP2CONbits.EN = false;
+	T1CONbits.TMR1ON = false;
+	TMR1 = 0;
+}
+
+void mod_0() {
+	TMR4 = 0;
+	CCPR2L = 8;
+	CCP2CONbits.EN = true;
+	T1CONbits.TMR1ON = true;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	CCPR2L = 7;
+	T4CONbits.ON = true;
+	while(T4CONbits.ON);
+	CCP2CONbits.EN = false;
+	T1CONbits.TMR1ON = false;
+	TMR1 = 0;
+}
+
 void main(void) {
 	static State state = STATE_IDLE;
 	static uint8_t val = 0;
@@ -47,15 +85,10 @@ void main(void) {
 	enable_comparator_int();
 	
 	init_timer2();
+	init_timer4();
 	init_ccp();
 	
 	TRISA = 0xFE;
-	
-	OSCTUNE = -32;
-	
-	for(;;) {
-		//test_cwg();
-	}
 	
 	T2CONbits.ON = false;
 	TMR2 = 0x0;
