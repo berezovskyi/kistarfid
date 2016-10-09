@@ -17,6 +17,15 @@ typedef enum State State;
 uint8_t edge_time = 0xFF;
 uint8_t packet[24];
 
+void test_cwg() {
+	PR4 = 33;
+	T4CONbits.ON = true;
+	for(uint8_t j = 0; j < 10; j++);
+	PR4 = 38;
+	for(uint8_t j = 0; j < 10; j++);
+	T4CONbits.ON = false;
+}
+
 void main(void) {
 	static State state = STATE_IDLE;
 	static uint8_t val = 0;
@@ -38,8 +47,15 @@ void main(void) {
 	enable_comparator_int();
 	
 	init_timer2();
+	init_ccp();
 	
 	TRISA = 0xFE;
+	
+	OSCTUNE = -32;
+	
+	for(;;) {
+		//test_cwg();
+	}
 	
 	T2CONbits.ON = false;
 	TMR2 = 0x0;
