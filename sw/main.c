@@ -3,6 +3,14 @@
 #include <stdbool.h>
 #include <pic12f1612.h>
 
+#define MOD_BIT() do { \
+		if(byte & 0x1) \
+			mod_1(); \
+		else \
+			mod_0(); \
+		byte >>= 1; \
+	} while(false)
+
 enum State {
 	STATE_IDLE,
 	STATE_BYTE0,
@@ -39,6 +47,10 @@ void mod_start() {
 	while(T4CONbits.ON);
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
+	
+	T1CONbits.TMR1ON = false;
+	TMR0 = 0;
+	T1CONbits.TMR1ON = true;
 	
 	CCPR2L = 7;
 	T4CONbits.ON = true;
@@ -120,14 +132,15 @@ void mod_0() {
 }
 
 void mod_byte(uint8_t byte) {
-	for(uint8_t j = 0; j < 8; j++) {
-		if(byte & 0x1)
-			mod_1();
-		else
-			mod_0();
-		
-		byte >>= 1;
-	}
+	MOD_BIT();
+	MOD_BIT();
+	MOD_BIT();
+	MOD_BIT();
+	
+	MOD_BIT();
+	MOD_BIT();
+	MOD_BIT();
+	MOD_BIT();
 }
 
 void main(void) {
