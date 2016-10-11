@@ -238,16 +238,16 @@ void main(void) {
 				mod_start();
 				mod_byte(0x0); //flags
 				mod_byte(0x0); //dfsid
-				mod_byte(0xDE);
+				mod_byte(0x0);
 				mod_byte(0xAD);
 				mod_byte(0xBE);
 				mod_byte(0xEF);
 				mod_byte(0xCA);
 				mod_byte(0xFE);
 				mod_byte(0xBA);
-				mod_byte(0xBE);
-				mod_byte(0x00); //crc
-				mod_byte(0x00); //crc
+				mod_byte(0xE0);
+				mod_byte(0x2B); //crc
+				mod_byte(0x49); //crc
 				mod_end();
 				
 				state = STATE_IDLE;
