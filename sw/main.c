@@ -242,6 +242,51 @@ void mod_byte(uint8_t byte) {
 	MOD_BIT();
 }
 
+void crc_init() {
+    CRCCON0bits.CRCGO = false;
+    
+    CRCACCL = 0xFF; // seed value
+    CRCACCH = 0xFF;
+    
+    CRCXORL = 0x08; // ISO 13239 poly
+    CRCXORH = 0x84;
+    
+    CRCCON1bits.DLEN = 0x7; // data len
+    CRCCON1bits.PLEN = 0xF; // poly len
+    
+    CRCCON0bits.SHIFTM = true; // LSB first
+    
+    CRCCON0bits.CRCGO = true;
+}
+
+uint16_t crc_compute(uint8_t* bytes, uint8_t len) {    
+    for (uint8_t pos = 0; pos < len; pos++) {
+        while(CRCCON0bits.FULL);
+
+        CRCDATL = bytes[pos];
+    }
+    
+    while(CRCCON0bits.BUSY);
+    return ~((CRCACCH << 8) | CRCACCL);
+}
+
+void crc_test() {
+    
+    for(;;) {
+        PORTAbits.RA0 = false;
+        // expected 0x003C
+        uint8_t bytes[10] = {
+            0x0, 0x0, 0x0, 0xFE, 
+            0xCA,0xEF,0xBE,0xAD,
+            0xDE,0xE0
+        };
+        crc_init();
+        uint16_t crc = crc_compute(bytes, sizeof(bytes)/sizeof(bytes[0]));
+        
+        PORTAbits.RA0 = crc == 0x003C;
+    }
+}
+
 void main(void) {
 	static State state = STATE_IDLE;
 	static uint8_t val = 0;
@@ -277,6 +322,9 @@ void main(void) {
 
 	INTCONbits.PEIE = true;
 	INTCONbits.GIE = true;
+    
+    
+    crc_test();
 
 	for(;;) {
 		switch(state) {
