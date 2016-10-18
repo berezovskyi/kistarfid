@@ -243,26 +243,32 @@ void mod_byte(uint8_t byte) {
 }
 
 void crc_init() {
+    CRCCON0bits.EN = false;
     CRCCON0bits.EN = true;
     
-    CRCACCL = 0xFF; // seed value
     CRCACCH = 0xFF;
+    CRCACCL = 0xFF; // seed value
+
     
     CRCXORH = 0x10; // ISO 13239 poly
     CRCXORL = 0x21; 
 
+    CRCXORH = 0x84; // ISO 13239 poly
+    CRCXORL = 0x08; 
+    
     
     CRCCON1bits.DLEN = 0x7; // data len
     CRCCON1bits.PLEN = 0xF; // poly len
  
-    CRCCON0bits.ACCM = false;
+    CRCCON0bits.ACCM = true;
     
     CRCCON0bits.SHIFTM = true; // LSB first
     
     CRCCON0bits.CRCGO = true;
 }
 
-uint16_t crc_compute(uint8_t* bytes, uint8_t len) {    
+uint16_t crc_compute(uint8_t* bytes, uint8_t len) { 
+    crc_init();
     for (uint8_t pos = 0; pos < len; pos++) {
         while(CRCCON0bits.FULL);
         CRCDATL = bytes[pos];
@@ -278,26 +284,22 @@ uint16_t crc_compute(uint8_t* bytes, uint8_t len) {
 //    0xDE,0xE0
 //};
 
-uint8_t bytes[4] = {
-    0x1, 0x2, 0x3, 0x4
+uint8_t bytes[1] = {
+    0x51
 };
 void crc_test() {
-    crc_init();
-    for(;;) {
-        PORTAbits.RA0 = true;
-        PORTAbits.RA0 = false;
-//        for(uint8_t i = 0; i < 255; i++);
-        // expected 0x003C
-        
+    for(;;) {        
         uint16_t crc = crc_compute(bytes, sizeof(bytes)/sizeof(bytes[0]));
         
 //        PORTAbits.RA0 = (crc == 0x003C || crc == 0x3C00 || crc == ~0x003C || crc == ~0x3C00);
 //        PORTAbits.RA0 = (crc == 0x3991 || crc == 0x9139);
         
         uint8_t packet2[2];
-        packet2[1] = (crc >> 8) & 0xFF;
-        packet2[0] = crc & 0xFF;
+        packet2[0] = (crc >> 8) & 0xFF;
+        packet2[1] = crc & 0xFF;
         
+        PORTAbits.RA0 = true;
+        PORTAbits.RA0 = false;
         for(uint8_t j = 0; j <= 1; j++) {
             uint8_t k, l;
             for(k = 0; k < 8; k++) {
@@ -309,7 +311,7 @@ void crc_test() {
             PORTAbits.RA0 = false;
             for(k = 0; k < 20; k++);
         }
-        for(int i = 0; i < 100; i++);
+        for(volatile uint8_t i = 0; i < 100; i++);
     }
 }
 

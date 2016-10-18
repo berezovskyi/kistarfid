@@ -1,2 +1,7 @@
 *~
 /datasheets/
+
+*.swp
+*.out
+/sw/crc
+/sw/debug/
