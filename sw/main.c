@@ -126,19 +126,19 @@ uint8_t packet[24];
 
 void mod_start() {
 	OSCTUNE = -32;
-	
+
 	TMR4 = 0;
 	CCPR2L = 7;
 	CCP2CONbits.EN = true;
 	T1CONbits.TMR1ON = true;
-	
+
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	CCPR2L = 8;
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
@@ -146,19 +146,19 @@ void mod_start() {
 	while(T4CONbits.ON);
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	T1CONbits.TMR1ON = false;
 	TMR0 = 0;
 	T1CONbits.TMR1ON = true;
-	
+
 	CCPR2L = 7;
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	CCPR2L = 8;
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	CCP2CONbits.EN = false;
 	T1CONbits.TMR1ON = false;
 	TMR1 = 0;
@@ -168,15 +168,15 @@ void mod_end() {
 	TMR4 = 0;
 	CCP2CONbits.EN = true;
 	T1CONbits.TMR1ON = true;
-	
+
 	CCPR2L = 8;
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	CCPR2L = 7;
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	CCPR2L = 8;
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
@@ -184,7 +184,7 @@ void mod_end() {
 	while(T4CONbits.ON);
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	CCPR2L = 7;
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
@@ -192,11 +192,11 @@ void mod_end() {
 	while(T4CONbits.ON);
 	T4CONbits.ON = true;
 	while(T4CONbits.ON);
-	
+
 	CCP2CONbits.EN = false;
 	T1CONbits.TMR1ON = false;
 	TMR1 = 0;
-	
+
 	OSCTUNE = 0;
 }
 
@@ -235,7 +235,7 @@ void mod_byte(uint8_t byte) {
 	MOD_BIT();
 	MOD_BIT();
 	MOD_BIT();
-	
+
 	MOD_BIT();
 	MOD_BIT();
 	MOD_BIT();
@@ -246,7 +246,7 @@ void main(void) {
 	static State state = STATE_IDLE;
 	static uint8_t val = 0;
 	static uint8_t i = 0;
-	
+
 	// set the frequency to 4MHz
 	init_oscillator();
 
@@ -258,32 +258,32 @@ void main(void) {
 
 	// enable comparator from Vref via DAC (-) to RA1
 	init_comparator();
-	
+
 	// enable comparator interrupts
 	enable_comparator_int();
-	
+
 	init_timer2();
 	init_timer4();
 	init_ccp();
-	
+
 	TRISA = 0xFE;
-	
+
 	T2CONbits.ON = false;
 	TMR2 = 0x0;
 	PIR1bits.TMR2IF = false;
 	PIR2bits.C1IF = false;
-	
+
 	PIE2bits.C1IE = true;
-	
+
 	INTCONbits.PEIE = true;
 	INTCONbits.GIE = true;
-	
+
 	for(;;) {
 		switch(state) {
-			case STATE_IDLE:	
+			case STATE_IDLE:
 				if(PIR1bits.TMR2IF) {
 					PIR1bits.TMR2IF = false;
-					
+
 					if(edge_time > 80 && edge_time < 108) {
 						state = STATE_BYTE0;
 						val = 0;
@@ -293,11 +293,11 @@ void main(void) {
 						T2CONbits.ON = false;
 						TMR2 = 0x0;
 					}
-					
+
 					edge_time = 0xFF;
 				}
 				break;
-			
+
 			case STATE_BYTE0:
 			case STATE_BYTE1:
 			case STATE_BYTE2:
@@ -305,9 +305,9 @@ void main(void) {
 				if(PIR1bits.TMR2IF) {
 					PIR1bits.TMR2IF = false;
 					state = state + 1;
-					
+
 					val >>= 2;
-					
+
 					if(edge_time == 0xFF) {
 						state = STATE_DONE;
 					} if(edge_time < 40) {
@@ -319,21 +319,21 @@ void main(void) {
 					} else {
 						val |= 0xC0;
 					}
-					
-					
+
+
 					edge_time = 0xFF;
 				}
 				break;
-			
+
 			case STATE_NEXT_BYTE:
 				packet[i++] = val;
 				val = 0x0;
 				state = STATE_BYTE0;
 				break;
-			
+
 			case STATE_DONE:
 				T2CONbits.ON = false;
-				
+
 				mod_start();
 				mod_byte(0x0); //flags
 				mod_byte(0x0); //dfsid
@@ -348,7 +348,7 @@ void main(void) {
 				mod_byte(0x3C); //crc
 				mod_byte(0x00); //crc
 				mod_end();
-				
+
 				state = STATE_IDLE;
 				TMR2 = 0x0;
 				break;
