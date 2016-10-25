@@ -40,7 +40,7 @@ void main(void)
 
 	TRISA = 0xFE;
 
-	//    crc_test();
+	// crc_test();
 
 	// set 2V fixed Vref
 	init_vref();
