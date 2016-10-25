@@ -253,10 +253,6 @@ void crc_init() {
     CRCXORH = 0x10; // ISO 13239 poly
     CRCXORL = 0x21;
 
-    CRCXORH = 0x84; // ISO 13239 poly
-    CRCXORL = 0x08;
-
-
     CRCCON1bits.DLEN = 0x7; // data len
     CRCCON1bits.PLEN = 0xF; // poly len
 
@@ -267,7 +263,38 @@ void crc_init() {
     CRCCON0bits.CRCGO = true;
 }
 
-uint16_t crc_compute(uint8_t* bytes, uint8_t len) {
+uint8_t crc_lo;
+uint8_t crc_hi;
+uint16_t scratch;
+
+uint16_t reverse_bits(uint16_t* word) {
+    scratch = *word;
+    *word = 0;
+    while (scratch!=0){
+        (*word) <<= 1;
+        (*word) |= (scratch & 1);
+        scratch >>= 1;
+    }
+    
+    return (*word);
+}
+
+inline uint8_t reverse_8b(uint8_t b) {
+    b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
+    b = (b & 0xCC) >> 2 | (b & 0x33) << 2;
+    b = (b & 0xAA) >> 1 | (b & 0x55) << 1;
+    return b;
+}
+
+inline void reverse_crc() {
+    scratch = crc_lo;
+    crc_lo = crc_hi;
+    crc_hi = scratch;
+    crc_lo = reverse_8b(crc_lo);
+    crc_hi = reverse_8b(crc_hi);
+}
+
+inline void crc_compute(uint8_t* bytes, uint8_t len) {
     crc_init();
     for (uint8_t pos = 0; pos < len; pos++) {
         while(CRCCON0bits.FULL);
@@ -275,7 +302,10 @@ uint16_t crc_compute(uint8_t* bytes, uint8_t len) {
     }
 
     while(CRCCON0bits.BUSY);
-    return ~(((uint16_t)CRCACCH << 8) | CRCACCL);
+//    crc_sum = ~(((uint16_t)CRCACCH << 8) | CRCACCL);
+    crc_lo = ~CRCACCL;
+    crc_hi = ~CRCACCH;
+    return; //reverse_bits(&crc_sum);
 }
 
 //uint8_t bytes[10] = {
@@ -287,30 +317,41 @@ uint16_t crc_compute(uint8_t* bytes, uint8_t len) {
 uint8_t bytes[1] = {
     0x51
 };
+
+void crc_eq_pin() {
+    PORTAbits.RA0 = (0xB3 == crc_hi && 0x74 == crc_lo);
+}
+
+void crc_manchester() {
+    uint8_t packet2[2];
+    packet2[0] = crc_hi;
+    packet2[1] = crc_lo;
+
+    PORTAbits.RA0 = true;
+    PORTAbits.RA0 = false;
+    for(uint8_t j = 0; j <= 1; j++) {
+        uint8_t k, l;
+        for(k = 0; k < 8; k++) {
+            PORTAbits.RA0 = (packet2[j] >> (7 - k)) ^ 0x1;
+            for(l = 0; l < 2; l++);
+            PORTAbits.RA0 = (packet2[j] >> (7 - k)) ^ 0x0;
+            for(l = 0; l < 2; l++);
+        }
+        PORTAbits.RA0 = false;
+        for(k = 0; k < 20; k++);
+    }
+}
+
 void crc_test() {
     for(;;) {
-        uint16_t crc = crc_compute(bytes, sizeof(bytes)/sizeof(bytes[0]));
-
-//        PORTAbits.RA0 = (crc == 0x003C || crc == 0x3C00 || crc == ~0x003C || crc == ~0x3C00);
-//        PORTAbits.RA0 = (crc == 0x3991 || crc == 0x9139);
-
-        uint8_t packet2[2];
-        packet2[0] = (crc >> 8) & 0xFF;
-        packet2[1] = crc & 0xFF;
-
         PORTAbits.RA0 = true;
         PORTAbits.RA0 = false;
-        for(uint8_t j = 0; j <= 1; j++) {
-            uint8_t k, l;
-            for(k = 0; k < 8; k++) {
-                PORTAbits.RA0 = (packet2[j] >> (7 - k)) ^ 0x1;
-                for(l = 0; l < 2; l++);
-                PORTAbits.RA0 = (packet2[j] >> (7 - k)) ^ 0x0;
-                for(l = 0; l < 2; l++);
-            }
-            PORTAbits.RA0 = false;
-            for(k = 0; k < 20; k++);
-        }
+        
+        crc_compute(bytes, sizeof(bytes)/sizeof(bytes[0]));
+        reverse_crc();
+        crc_eq_pin();
+//        crc_manchester();
+
         for(volatile uint8_t i = 0; i < 100; i++);
     }
 }
