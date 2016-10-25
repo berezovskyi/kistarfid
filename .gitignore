@@ -3,3 +3,8 @@
 *.aux
 *.log
 *.pdf
+
+*.swp
+*.out
+/sw/crc
+/sw/debug/
