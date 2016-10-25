@@ -1,12 +1,12 @@
-#define	DATA_LEN		1
+#define	DATA_LEN		10
 #define	POLYNOMIAL		0x8408
 
 #include <stdint.h>
 #include <stdio.h>
 
 int main(int argc, char **argv) {
-//uint8_t data[DATA_LEN + 2] = { 0, 0, 0x0, 0xFE, 0xCA, 0xEF, 0xBE, 0xAD, 0xDE, 0xE0 };
-    uint8_t data[DATA_LEN] = { 0x51 };
+    uint8_t data[DATA_LEN + 2] = { 0, 0, 0x0, 0xFE, 0xCA, 0xEF, 0xBE, 0xAD, 0xDE, 0xE0 };
+    //uint8_t data[DATA_LEN] = { 0x51 };
 	uint16_t cur_crc;
 	int i, j;
 	int cnt;
