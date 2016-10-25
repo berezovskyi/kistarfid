@@ -296,26 +296,25 @@ inline void reverse_crc() {
 
 inline void crc_compute(uint8_t* bytes, uint8_t len) {
     crc_init();
+    crc_lo = 0x0;
+    crc_hi = 0x0;
+    scratch = 0x0;
     for (uint8_t pos = 0; pos < len; pos++) {
         while(CRCCON0bits.FULL);
         CRCDATL = bytes[pos];
     }
 
     while(CRCCON0bits.BUSY);
-//    crc_sum = ~(((uint16_t)CRCACCH << 8) | CRCACCL);
     crc_lo = ~CRCACCL;
     crc_hi = ~CRCACCH;
-    return; //reverse_bits(&crc_sum);
+    reverse_crc();
+    return;
 }
 
-//uint8_t bytes[10] = {
-//    0x0, 0x0, 0x0, 0xFE,
-//    0xCA,0xEF,0xBE,0xAD,
-//    0xDE,0xE0
-//};
-
-uint8_t bytes[1] = {
-    0x51
+uint8_t bytes[10] = {
+    0x0, 0x0, 0xEE, 0xFE,
+    0xCA,0xEF,0xBE,0xAD,
+    0xDE,0xE0
 };
 
 void crc_eq_pin() {
@@ -348,7 +347,6 @@ void crc_test() {
         PORTAbits.RA0 = false;
         
         crc_compute(bytes, sizeof(bytes)/sizeof(bytes[0]));
-        reverse_crc();
         crc_eq_pin();
 //        crc_manchester();
 
@@ -366,7 +364,7 @@ void main(void) {
 
     TRISA = 0xFE;
 
-    crc_test();
+//    crc_test();
 
 	// set 2V fixed Vref
 	init_vref();
@@ -455,19 +453,21 @@ void main(void) {
 			case STATE_DONE:
 				T2CONbits.ON = false;
 
+                crc_compute(bytes, sizeof(bytes)/sizeof(bytes[0]));
+
 				mod_start();
-				mod_byte(0x0); //flags
-				mod_byte(0x0); //dfsid
-				mod_byte(0x0);
-				mod_byte(0xFE);
-				mod_byte(0xCA);
-				mod_byte(0xEF);
-				mod_byte(0xBE);
-				mod_byte(0xAD);
-				mod_byte(0xDE);
-				mod_byte(0xE0);
-				mod_byte(0x3C); //crc
-				mod_byte(0x00); //crc
+                mod_byte(bytes[0]);
+                mod_byte(bytes[1]);
+                mod_byte(bytes[2]);
+                mod_byte(bytes[3]);
+                mod_byte(bytes[4]);
+                mod_byte(bytes[5]);
+                mod_byte(bytes[6]);
+                mod_byte(bytes[7]);
+                mod_byte(bytes[8]);
+                mod_byte(bytes[9]);
+  				mod_byte(crc_lo); //crc
+				mod_byte(crc_hi); //crc
 				mod_end();
 
 				state = STATE_IDLE;
