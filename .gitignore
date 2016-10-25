@@ -1,2 +1,5 @@
 *~
 /datasheets/
+*.aux
+*.log
+*.pdf
