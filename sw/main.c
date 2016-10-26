@@ -121,8 +121,18 @@ void main(void)
 
 		case STATE_DONE:
 			T2CONbits.ON = false;
-			
-			cmd_inventory();
+		
+			switch (packet[1]) {
+				case 0x1:
+					cmd_inventory();
+					break;
+				case 0x20:
+					cmd_read();
+					break;
+				default:
+					/* lol */
+					break;
+			}
 			
 
 			state = STATE_IDLE;

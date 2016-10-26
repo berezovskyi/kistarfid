@@ -26,8 +26,9 @@ void cmd_inventory() {
 	mod_end();
 }
 
-static uint8_t cmd_read_data[5] = {
-	0x0,
+static uint8_t cmd_read_data[6] = {
+	0x40,	/* Option flag set -> security status included */
+	0x0,	/* Security status */
 	'A', 'R', 'N', 'E',
 };
 
@@ -40,6 +41,7 @@ void cmd_read() {
 	mod_byte(cmd_read_data[2]);
 	mod_byte(cmd_read_data[3]);
 	mod_byte(cmd_read_data[4]);
+	mod_byte(cmd_read_data[5]);
 	mod_byte(crc_lo); //crc
 	mod_byte(crc_hi); //crc
 	mod_end();
