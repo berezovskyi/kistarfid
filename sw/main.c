@@ -5,6 +5,8 @@
 
 #include "mod.h"
 #include "crc_pic.h"
+#include "cmd.h"
+#include "init.h"
 
 enum State {
 	STATE_IDLE,
@@ -22,12 +24,6 @@ uint8_t packet[24];
 uint8_t crc_lo;
 uint8_t crc_hi;
 uint16_t scratch;
-
-uint8_t bytes[10] = {
-	0x0, 0x0, 0xEE, 0xFE,
-	0xCA, 0xEF, 0xBE, 0xAD,
-	0xDE, 0xE0
-};
 
 void main(void)
 {
@@ -125,23 +121,9 @@ void main(void)
 
 		case STATE_DONE:
 			T2CONbits.ON = false;
-
-			crc_compute(bytes, sizeof (bytes) / sizeof (bytes[0]));
-
-			mod_start();
-			mod_byte(bytes[0]);
-			mod_byte(bytes[1]);
-			mod_byte(bytes[2]);
-			mod_byte(bytes[3]);
-			mod_byte(bytes[4]);
-			mod_byte(bytes[5]);
-			mod_byte(bytes[6]);
-			mod_byte(bytes[7]);
-			mod_byte(bytes[8]);
-			mod_byte(bytes[9]);
-			mod_byte(crc_lo); //crc
-			mod_byte(crc_hi); //crc
-			mod_end();
+			
+			cmd_inventory();
+			
 
 			state = STATE_IDLE;
 			TMR2 = 0x0;

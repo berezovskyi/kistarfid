@@ -25,19 +25,6 @@ void crc_init()
 	CRCCON0bits.CRCGO = true;
 }
 
-uint16_t reverse_bits(uint16_t word)
-{
-	scratch = word;
-	word = 0;
-	while (scratch != 0) {
-		word <<= 1;
-		word |= (scratch & 1);
-		scratch >>= 1;
-	}
-
-	return word;
-}
-
 inline uint8_t reverse_8b(uint8_t b)
 {
 	b = (b & 0xF0) >> 4 | (b & 0x0F) << 4;
@@ -55,7 +42,7 @@ inline void reverse_crc()
 	crc_hi = reverse_8b(crc_hi);
 }
 
-inline void crc_compute(uint8_t* bytes, uint8_t len)
+inline void crc_compute(const uint8_t *bytes, uint8_t len)
 {
 	crc_init();
 	crc_lo = 0x0;
@@ -71,44 +58,4 @@ inline void crc_compute(uint8_t* bytes, uint8_t len)
 	crc_hi = ~CRCACCH;
 	reverse_crc();
 	return;
-}
-
-void crc_eq_pin()
-{
-	PORTAbits.RA0 = (0xB3 == crc_hi && 0x74 == crc_lo);
-}
-
-void crc_manchester()
-{
-	uint8_t packet2[2];
-	packet2[0] = crc_hi;
-	packet2[1] = crc_lo;
-
-	PORTAbits.RA0 = true;
-	PORTAbits.RA0 = false;
-	for (uint8_t j = 0; j <= 1; j++) {
-		uint8_t k, l;
-		for (k = 0; k < 8; k++) {
-			PORTAbits.RA0 = (packet2[j] >> (7 - k)) ^ 0x1;
-			for (l = 0; l < 2; l++);
-			PORTAbits.RA0 = (packet2[j] >> (7 - k)) ^ 0x0;
-			for (l = 0; l < 2; l++);
-		}
-		PORTAbits.RA0 = false;
-		for (k = 0; k < 20; k++);
-	}
-}
-
-void crc_test()
-{
-	for (;;) {
-		PORTAbits.RA0 = true;
-		PORTAbits.RA0 = false;
-
-		crc_compute(bytes, sizeof (bytes) / sizeof (bytes[0]));
-		crc_eq_pin();
-		//        crc_manchester();
-
-		for (volatile uint8_t i = 0; i < 100; i++);
-	}
 }
