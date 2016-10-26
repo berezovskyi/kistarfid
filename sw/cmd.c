@@ -1,5 +1,6 @@
 #include "crc_pic.h"
 #include "mod.h"
+#include "tempsens.h"
 
 static const uint8_t cmd_inventory_data[10] = {
 	0x0, 0x0, 0xEE, 0xFE,
@@ -29,11 +30,13 @@ void cmd_inventory() {
 static uint8_t cmd_read_data[6] = {
 	0x40,	/* Option flag set -> security status included */
 	0x0,	/* Security status */
-	'A', 'R', 'N', 'E',
+	0xDE, 0xAD, 0xEF, 0xBE,
 };
 
 
 void cmd_read() {
+	//cmd_read_data[2] = tempsens_get_low();
+	//cmd_read_data[3] = tempsens_get_high();
 	crc_compute(cmd_read_data, sizeof (cmd_read_data) / sizeof (cmd_read_data[0]));
 	mod_start();
 	mod_byte(cmd_read_data[0]);

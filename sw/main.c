@@ -7,6 +7,7 @@
 #include "crc_pic.h"
 #include "cmd.h"
 #include "init.h"
+#include "tempsens.h"
 
 enum State {
 	STATE_IDLE,
@@ -34,7 +35,7 @@ void main(void)
 	// set the frequency to 4MHz
 	init_oscillator();
 
-	TRISA = 0xFE;
+	TRISA = 0xDF;
 
 	// crc_test();
 
@@ -63,6 +64,7 @@ void main(void)
 
 	INTCONbits.PEIE = true;
 	INTCONbits.GIE = true;
+	//tempsens_init();
 
 
 	for (;;) {
@@ -75,6 +77,7 @@ void main(void)
 					state = STATE_BYTE0;
 					val = 0;
 					i = 0;
+					//tempsens_prepare();
 				} else {
 					state = STATE_IDLE;
 					T2CONbits.ON = false;
