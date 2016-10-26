@@ -14,9 +14,11 @@
       <itemPath>interrupts.c</itemPath>
       <itemPath>main.c</itemPath>
       <itemPath>init.c</itemPath>
-      <itemPath>mod.c.txt</itemPath>
       <itemPath>mod.c</itemPath>
       <itemPath>crc_pic.c</itemPath>
+      <itemPath>cmd.c</itemPath>
+      <itemPath>cmd.h</itemPath>
+      <itemPath>init.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -38,7 +40,7 @@
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

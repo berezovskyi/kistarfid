@@ -30,7 +30,7 @@ inline uint8_t reverse_8b(uint8_t b);
 
 inline void reverse_crc();
 
-inline void crc_compute(uint8_t* bytes, uint8_t len);
+inline void crc_compute(const uint8_t *bytes, uint8_t len);
 
 void crc_eq_pin();
 

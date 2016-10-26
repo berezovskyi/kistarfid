@@ -26,11 +26,6 @@ void init_dac() {
 	DAC1CON0bits.DAC1OE = false;
 }
 
-void test_dac() {
-	// outputs DAC voltage to RA0
-	DAC1CON0bits.DAC1OE = true;
-}
-
 void init_comparator() {
 	CM1CON0bits.C1ON = true;
 	CM1CON0bits.C1POL = false;
