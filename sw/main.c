@@ -64,7 +64,7 @@ void main(void)
 
 	INTCONbits.PEIE = true;
 	INTCONbits.GIE = true;
-	//tempsens_init();
+	tempsens_init();
 
 
 	for (;;) {
@@ -77,7 +77,7 @@ void main(void)
 					state = STATE_BYTE0;
 					val = 0;
 					i = 0;
-					//tempsens_prepare();
+					tempsens_prepare();
 				} else {
 					state = STATE_IDLE;
 					T2CONbits.ON = false;
