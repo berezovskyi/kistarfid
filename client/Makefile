@@ -1,4 +1,4 @@
-CFLAGS += -Wall -O0
+CFLAGS += -Wall -g -O0
 LDFLAGS += -lm -ldarnit
 
 # Hidden directory for dependency files
