@@ -11,7 +11,7 @@
 #define	TEMPSENS_H
 
 void tempsens_init();
-void tempsens_prepare();
+inline void tempsens_prepare();
 inline uint8_t tempsens_get_low();
 inline uint8_t tempsens_get_high();
 

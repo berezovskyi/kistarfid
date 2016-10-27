@@ -14,7 +14,7 @@ void tempsens_init() {
 }
 
 
-void tempsens_prepare() {
+inline void tempsens_prepare() {
 		ADCON0bits.GO = 1;
 }
 
