@@ -61,6 +61,36 @@ static int _read_port(int fd, uint8_t *buff, int bytes) {
 }
 
 
+uint64_t tag_get_id(Tag *tag) {
+	int i;
+
+	uint8_t cmd[] = { 1, 0, 0, 0, 0, 0, 0x60, 0x11, 0x7, 0x1, 0, /* ISO Inventory, no mask */
+			0, 0 };
+	
+	uint64_t id;
+	uint8_t chksm = 0, ret[258];
+	cmd[1] = sizeof(cmd);
+	for (i = 0; i < sizeof(cmd) - 2; i++)
+		chksm ^= cmd[i];
+	cmd[sizeof(cmd) - 2] = chksm;
+	cmd[sizeof(cmd) - 1] = ~chksm;
+
+	write(tag->serial_fd, cmd, sizeof(cmd));
+	_read_port(tag->serial_fd, ret, 2);
+	_read_port(tag->serial_fd, ret + 2, ret[1] - 2);
+	if (ret[1] == 10 && ret[5] == 0x10)
+		return fprintf(stderr, "ERROR %i\n", ret[7]), 0;
+	if (!(ret[7] || ret[8]))
+		return fprintf(stderr, "No data\n"), 0;
+	//if (ret[9] || ret[10])
+	//	return fprintf(stderr, "Collision!\n"), 0;
+	
+	for (i = 0; i < 8; i++)
+		id = (uint64_t) ret[13 + 8] << (i * 8);
+	return id;
+}
+
+
 static uint16_t _read_block(uint8_t addr, int fd, uint64_t tag_id) {
 	uint8_t cmd[] = { 1, 0, 0, 0, 0, 0, 0x60, 0x11, 0x63, 0x20, /* <- Reader crap */
 		0, 0, 0, 0, 0, 0, 0, 0, /* Tag addr */
