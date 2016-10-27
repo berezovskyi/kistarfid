@@ -16,23 +16,10 @@ extern "C" {
 #include <stdbool.h>
 #include <pic12f1612.h>
 
-#define MOD_BIT() do { \
-		if(byte & 0x1) \
-			mod_1(); \
-		else \
-			mod_0(); \
-		byte >>= 1; \
-	} while(false)
-
-
 void mod_start();
-
 void mod_end();
-
 void mod_1();
-
 void mod_0();
-
 void mod_byte(uint8_t byte);
 
 
