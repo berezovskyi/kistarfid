@@ -17,9 +17,9 @@
 #include "tag.h"
 #include "trigonometry.h"
 
-#define ADDR_Z 0x0
+#define ADDR_X 0x0
 #define ADDR_Y 0x2
-#define ADDR_X 0x3
+#define ADDR_Z 0x3
 #define ADDR_TEMP 0x1E
 
 static int _get_serial_port(const char *path) {
@@ -91,7 +91,7 @@ static uint16_t _read_block(uint8_t addr, int fd, uint64_t tag_id) {
 
 
 double tag_get_angle(Tag *tag) {
-	static int16_t xacc, yacc;
+	int16_t xacc, yacc;
 	uint16_t tmp;
 	int i;
 	double xavg, yavg;
@@ -101,6 +101,8 @@ double tag_get_angle(Tag *tag) {
 		tmp >>= 6;
 		xacc = tmp;
 		xacc -= 512;
+	} else {
+		xacc = tag->data[tag->data_samples - 1].x;
 	}
 	
 	tmp = _read_block(ADDR_Y, tag->serial_fd, tag->id);
@@ -108,6 +110,8 @@ double tag_get_angle(Tag *tag) {
 		tmp >>= 6;
 		yacc = tmp;
 		yacc -= 512;
+	} else {
+		yacc = tag->data[tag->data_samples - 1].y;
 	}
 	
 	xavg = xacc;
@@ -127,7 +131,7 @@ double tag_get_angle(Tag *tag) {
 	fprintf(stderr, "xacc: %f, xavg: %f, yacc: %f, yavg: %f\n", ((float) xacc) / 512, ((float) xavg) / 512, ((float) yacc) / 512, ((float) yavg) / 512);
 	
 	//return atan2(xavg, yavg);
-	return trig_delta_to_angle_d(xavg, yavg);
+	return trig_delta_to_angle_d(yavg, xavg);
 	//return atan2(xacc, yacc);
 }
 
