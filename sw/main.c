@@ -7,7 +7,7 @@
 #include "crc_pic.h"
 #include "cmd.h"
 #include "init.h"
-#include "tempsens.h"
+#include "adc.h"
 
 enum State {
 	STATE_IDLE,
@@ -64,7 +64,7 @@ void main(void)
 
 	INTCONbits.PEIE = true;
 	INTCONbits.GIE = true;
-	tempsens_init();
+	adc_init();
 
 
 	for (;;) {
@@ -77,7 +77,6 @@ void main(void)
 					state = STATE_BYTE0;
 					val = 0;
 					i = 0;
-					tempsens_prepare();
 				} else {
 					state = STATE_IDLE;
 					T2CONbits.ON = false;
@@ -130,6 +129,7 @@ void main(void)
 					cmd_inventory();
 					break;
 				case 0x20:
+					adc_sample(packet[10]);
 					cmd_read();
 					break;
 				default:
