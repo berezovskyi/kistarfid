@@ -35,8 +35,8 @@ static uint8_t cmd_read_data[6] = {
 
 
 void cmd_read() {
-	//cmd_read_data[2] = tempsens_get_low();
-	//cmd_read_data[3] = tempsens_get_high();
+	cmd_read_data[2] = tempsens_get_low();
+	cmd_read_data[3] = tempsens_get_high();
 	crc_compute(cmd_read_data, sizeof (cmd_read_data) / sizeof (cmd_read_data[0]));
 	mod_start();
 	mod_byte(cmd_read_data[0]);
