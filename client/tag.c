@@ -15,6 +15,7 @@
 #include <math.h>
 
 #include "tag.h"
+#include "trigonometry.h"
 
 #define ADDR_Z 0x0
 #define ADDR_Y 0x2
@@ -77,31 +78,37 @@ static uint16_t _read_block(uint8_t addr, int fd, uint64_t tag_id) {
 	cmd[20] = ~chksm;
 	
 	write(fd, cmd, sizeof(cmd));
-	fprintf(stderr, "data len: %i\n", _read_port(fd, ret, 2));
-	fprintf(stderr, "data: %i %i\n", ret[1], _read_port(fd, ret + 2, ret[1] - 2));
+//	fprintf(stderr, "data len: %i\n", _read_port(fd, ret, 2));
+	_read_port(fd, ret, 2);
+//	fprintf(stderr, "data: %i %i\n", ret[1], _read_port(fd, ret + 2, ret[1] - 2));
+	_read_port(fd, ret + 2, ret[1] - 2);
 	if (ret[1] == 10 && ret[5] == 0x10)
-		return fprintf(stderr, "ERROR %i\n", ret[7]), -1;
-	fprintf(stderr, "Data returned: 0x%X, 0x%X, 0x%X, 0x%X\n", ret[9], ret[10], ret[11], ret[12]);
+		return fprintf(stderr, "ERROR %i\n", ret[7]), 1;
+	//fprintf(stderr, "Data returned: 0x%X, 0x%X, 0x%X, 0x%X\n", ret[9], ret[10], ret[11], ret[12]);
 	
 	return (((uint16_t) ret[10]) << 8) | ret[9];
 }
 
 
 double tag_get_angle(Tag *tag) {
-	int16_t xacc, yacc;
+	static int16_t xacc, yacc;
 	uint16_t tmp;
 	int i;
 	double xavg, yavg;
 	
 	tmp = _read_block(ADDR_X, tag->serial_fd, tag->id);
-	tmp >>= 6;
-	xacc = tmp;
-	xacc -= 512;
+	if (tmp != 1) {
+		tmp >>= 6;
+		xacc = tmp;
+		xacc -= 512;
+	}
 	
 	tmp = _read_block(ADDR_Y, tag->serial_fd, tag->id);
-	tmp >>= 6;
-	yacc = tmp;
-	yacc -= 512;
+	if (tmp != 1) {
+		tmp >>= 6;
+		yacc = tmp;
+		yacc -= 512;
+	}
 	
 	xavg = xacc;
 	yavg = yacc;
@@ -116,8 +123,12 @@ double tag_get_angle(Tag *tag) {
 	
 	xavg /= tag->data_samples;
 	yavg /= tag->data_samples;
+
+	fprintf(stderr, "xacc: %f, xavg: %f, yacc: %f, yavg: %f\n", ((float) xacc) / 512, ((float) xavg) / 512, ((float) yacc) / 512, ((float) yavg) / 512);
 	
-	return atan2(xavg, yavg);
+	//return atan2(xavg, yavg);
+	return trig_delta_to_angle_d(xavg, yavg);
+	//return atan2(xacc, yacc);
 }
 
 Tag *tag_init(const char *serial, uint64_t id, size_t averaging_samples) {
