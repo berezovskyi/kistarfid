@@ -18,8 +18,8 @@ void mod_start()
 	OSCTUNE = -32;
 
 	TMR4 = 0;
-	CCPR2L = 7;
-	CCP2CONbits.EN = true;
+	CCPR1L = 7;
+	CCP1CONbits.EN = true;
 	T1CONbits.TMR1ON = true;
 
 	T4CONbits.ON = true;
@@ -29,7 +29,7 @@ void mod_start()
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 
-	CCPR2L = 8;
+	CCPR1L = 8;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 	T4CONbits.ON = true;
@@ -41,15 +41,15 @@ void mod_start()
 	TMR0 = 0;
 	T1CONbits.TMR1ON = true;
 
-	CCPR2L = 7;
+	CCPR1L = 7;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 
-	CCPR2L = 8;
+	CCPR1L = 8;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 
-	CCP2CONbits.EN = false;
+	CCP1CONbits.EN = false;
 	T1CONbits.TMR1ON = false;
 	TMR1 = 0;
 }
@@ -57,26 +57,18 @@ void mod_start()
 void mod_end()
 {
 	TMR4 = 0;
-	CCP2CONbits.EN = true;
+	CCP1CONbits.EN = true;
 	T1CONbits.TMR1ON = true;
 
-	CCPR2L = 8;
+	CCPR1L = 8;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 
-	CCPR2L = 7;
+	CCPR1L = 7;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 
-	CCPR2L = 8;
-	T4CONbits.ON = true;
-	while (T4CONbits.ON);
-	T4CONbits.ON = true;
-	while (T4CONbits.ON);
-	T4CONbits.ON = true;
-	while (T4CONbits.ON);
-
-	CCPR2L = 7;
+	CCPR1L = 8;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 	T4CONbits.ON = true;
@@ -84,7 +76,15 @@ void mod_end()
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
 
-	CCP2CONbits.EN = false;
+	CCPR1L = 7;
+	T4CONbits.ON = true;
+	while (T4CONbits.ON);
+	T4CONbits.ON = true;
+	while (T4CONbits.ON);
+	T4CONbits.ON = true;
+	while (T4CONbits.ON);
+
+	CCP1CONbits.EN = false;
 	T1CONbits.TMR1ON = false;
 	TMR1 = 0;
 
@@ -94,15 +94,15 @@ void mod_end()
 void mod_1()
 {
 	TMR4 = 0;
-	CCPR2L = 7;
-	CCP2CONbits.EN = true;
+	CCPR1L = 7;
+	CCP1CONbits.EN = true;
 	T1CONbits.TMR1ON = true;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
-	CCPR2L = 8;
+	CCPR1L = 8;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
-	CCP2CONbits.EN = false;
+	CCP1CONbits.EN = false;
 	T1CONbits.TMR1ON = false;
 	TMR1 = 0;
 }
@@ -110,15 +110,15 @@ void mod_1()
 void mod_0()
 {
 	TMR4 = 0;
-	CCPR2L = 8;
-	CCP2CONbits.EN = true;
+	CCPR1L = 8;
+	CCP1CONbits.EN = true;
 	T1CONbits.TMR1ON = true;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
-	CCPR2L = 7;
+	CCPR1L = 7;
 	T4CONbits.ON = true;
 	while (T4CONbits.ON);
-	CCP2CONbits.EN = false;
+	CCP1CONbits.EN = false;
 	T1CONbits.TMR1ON = false;
 	TMR1 = 0;
 }

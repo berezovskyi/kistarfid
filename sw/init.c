@@ -55,6 +55,7 @@ void init_timer2() {
 }
 
 void init_ccp() {
+	APFCONbits.CCP1SEL = 1;
 	T1CONbits.TMR1CS = 0x0;
 	T1CONbits.T1CKPS = 0x0;
 	T1CONbits.nT1SYNC = false;
@@ -65,11 +66,11 @@ void init_ccp() {
 	T1CONbits.TMR1ON = false;
 	T1GCONbits.TMR1GE = false;
 	
-	CCP2CONbits.MODE = 1; //compare, toggle and reset timer
-	CCPR2L = 8; //7 and 8 for subcarriers
-	CCPR2H = 0;
-	CCP2CONbits.EN = false;
-	CCP2CONbits.OE = true;
+	CCP1CONbits.MODE = 1; //compare, toggle and reset timer
+	CCPR1L = 8; //7 and 8 for subcarriers
+	CCPR1H = 0;
+	CCP1CONbits.EN = false;
+	CCP1CONbits.OE = true;
 }
 
 void init_timer4() {

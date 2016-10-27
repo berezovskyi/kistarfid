@@ -19,6 +19,8 @@
       <itemPath>cmd.c</itemPath>
       <itemPath>cmd.h</itemPath>
       <itemPath>init.h</itemPath>
+      <itemPath>tempsens.c</itemPath>
+      <itemPath>tempsens.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -175,7 +177,7 @@
         <property key="programoptions.testmodeentrymethod" value="VDDFirst"/>
         <property key="programoptions.usehighvoltageonmclr" value="false"/>
         <property key="programoptions.uselvpprogramming" value="false"/>
-        <property key="voltagevalue" value="2.75"/>
+        <property key="voltagevalue" value="2.25"/>
       </PICkit3PlatformTool>
       <Simulator>
         <property key="codecoverage.enabled" value="Disable"/>
@@ -501,7 +503,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -841,7 +843,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -1254,7 +1256,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -1594,7 +1596,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -2007,7 +2009,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -2347,7 +2349,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -2760,7 +2762,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>XC8</languageToolchain>
         <languageToolchainVersion>1.38</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>
@@ -3173,7 +3175,7 @@
         <platformTool>Simulator</platformTool>
         <languageToolchain>hi-tech-picc</languageToolchain>
         <languageToolchainVersion>9.83</languageToolchainVersion>
-        <platform>4</platform>
+        <platform>2</platform>
       </toolsSet>
       <compileType>
         <linkerTool>

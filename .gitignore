@@ -1,5 +1,8 @@
 *~
 /datasheets/
+*.aux
+*.log
+*.pdf
 
 *.swp
 *.out
