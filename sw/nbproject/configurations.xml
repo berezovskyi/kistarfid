@@ -19,8 +19,8 @@
       <itemPath>cmd.c</itemPath>
       <itemPath>cmd.h</itemPath>
       <itemPath>init.h</itemPath>
-      <itemPath>tempsens.c</itemPath>
-      <itemPath>tempsens.h</itemPath>
+      <itemPath>adc.c</itemPath>
+      <itemPath>adc.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
