@@ -146,11 +146,9 @@ int tag_get_id(Tag *tag, uint64_t tag_id[16]) {
 	bool more_to_do = true;
 
 	uint8_t cmd_inventory[] = { 1, 0, 0, 0, 0, 0, 0x60, 0x11, 0x7, 0x1, 0 };
-	uint8_t cmd[] = { 1, 0, 0, 0, 0, 0, 0x60, 0x11, 0x7, 0x1, 0, /* ISO Inventory, no mask */
-			0, 0 };
 	
 	uint64_t id;
-	uint8_t chksm = 0, ret[258];
+	uint8_t ret[258];
 	cmd_st = _alloc_stack_thing(256);
 	mask_st = _alloc_stack_thing64(256);
 	_push_array(cmd_st, cmd_inventory, sizeof(cmd_inventory));
