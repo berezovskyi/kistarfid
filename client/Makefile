@@ -7,7 +7,7 @@ df = $(DEPDIR)/$(*F)
 
 .PHONY: all clean
 
-all: orientation.elf inventory.elf
+all: orientation.elf inventory.elf temperature.elf
 
 clean:
 	@echo " [ RM ] *.elf *.o"
@@ -15,6 +15,10 @@ clean:
 	@$(RM) -R $(DEPDIR)
 
 orientation.elf: orientation.c.o tag.c.o trigonometry.c.o
+	@echo " [ LD ] $(CURRENTPATH)$@"
+	@$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+temperature.elf: temperature.c.o tag.c.o trigonometry.c.o
 	@echo " [ LD ] $(CURRENTPATH)$@"
 	@$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 

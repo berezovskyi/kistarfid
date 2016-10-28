@@ -2,16 +2,29 @@
 #include <stdint.h>
 #include <darnit/darnit.h>
 #include <math.h>
+#include <signal.h>
 
 #include "tag.h"
+
+void sigint(int num) {
+	d_quit();
+}
 
 int main(int argc, char **argv) {
 	int32_t angle = 0;
 	DARNIT_SPRITE *sprite;
 	Tag *tag;
-	d_init_custom("TrollTag Demo", 1280, 720, false, "trolltag", NULL);
-
-	tag = tag_init(argv[1], 0xe0deadbeefcafeee, 20);
+	
+	if(argc < 2) {
+		fprintf(stderr, "Usage: orientation.elf /dev/ttySerialDevice\n");
+		return 1;
+	}
+	
+	d_init_custom("0xDEADBEEF RFID Soft Tag Demo", 1280, 720, false, "0xdeadbeef", NULL);
+	
+	signal(SIGINT, sigint);
+	
+	tag = tag_init(argv[1], 0xe0deadbeefcafe00, 15);
 	d_render_blend_enable();
 	d_render_clearcolor_set(0xff, 0xff, 0xff);
 	sprite = d_sprite_load("tag.spr", 0, DARNIT_PFORMAT_RGBA8);
