@@ -17,7 +17,6 @@
 #include <limits.h>
 
 #include "tag.h"
-#include "trigonometry.h"
 
 #define ADDR_X 0x0
 #define ADDR_Y 0x2
@@ -318,9 +317,7 @@ double tag_get_angle(Tag *tag) {
 
 	fprintf(stderr, "xacc: %f, xavg: %f, yacc: %f, yavg: %f\n", ((float) xacc) / 512, ((float) xavg) / 512, ((float) yacc) / 512, ((float) yavg) / 512);
 	
-	//return atan2(xavg, yavg);
-	return trig_delta_to_angle_d(yavg, xavg);
-	//return atan2(xacc, yacc);
+	return atan2(xavg, yavg);
 }
 
 double tag_get_temperature(Tag *tag) {

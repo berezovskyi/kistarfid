@@ -14,15 +14,15 @@ clean:
 	@$(RM) *.o *.elf
 	@$(RM) -R $(DEPDIR)
 
-orientation.elf: orientation.c.o tag.c.o trigonometry.c.o
+orientation.elf: orientation.c.o tag.c.o
 	@echo " [ LD ] $(CURRENTPATH)$@"
 	@$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-temperature.elf: temperature.c.o tag.c.o trigonometry.c.o
+temperature.elf: temperature.c.o tag.c.o
 	@echo " [ LD ] $(CURRENTPATH)$@"
 	@$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-inventory.elf: inventory.c.o tag.c.o trigonometry.c.o
+inventory.elf: inventory.c.o tag.c.o
 	@echo " [ LD ] $(CURRENTPATH)$@"
 	@$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
