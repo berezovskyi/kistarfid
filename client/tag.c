@@ -190,7 +190,7 @@ Tag *tag_init(const char *serial, uint64_t id, size_t averaging_samples) {
 	if(!(tag = malloc(sizeof(Tag))))
 		return NULL;
 	
-	if(!(tag->data = malloc(sizeof(Tag)))) {
+	if(!(tag->data = malloc(averaging_samples*sizeof(IntVector2)))) {
 		free(tag);
 		return NULL;
 	}
@@ -201,7 +201,7 @@ Tag *tag_init(const char *serial, uint64_t id, size_t averaging_samples) {
 		return NULL;
 	}
 	
-	memset(tag->data, 0, averaging_samples);
+	memset(tag->data, 0, averaging_samples*sizeof(IntVector2));
 	tag->serial_fd = fd;
 	tag->data_samples = averaging_samples;
 	tag->id = id;
