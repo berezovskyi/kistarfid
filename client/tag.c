@@ -9,6 +9,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdbool.h>
 #include <termios.h>
 #include <sys/types.h>
@@ -22,8 +23,9 @@
 #define ADDR_Z 0x3
 #define ADDR_TEMP 0x1E
 
+
 static int _get_serial_port(const char *path) {
-	int fd;
+	int fd, flags;
 	struct termios tios;
 
 	if ((fd = open(path, O_RDWR | O_NOCTTY)) < 0) {
@@ -35,7 +37,7 @@ static int _get_serial_port(const char *path) {
 	tios.c_cflag &= ~(CSIZE | PARENB);
 	tios.c_cflag |= CS8;
 	tios.c_cc[VMIN] = 1;
-	tios.c_cc[VTIME] = 0;
+	tios.c_cc[VTIME] = 2;
 	tios.c_iflag = 0;
 	tios.c_oflag = 0;
 	tios.c_lflag = 0;
@@ -47,47 +49,202 @@ static int _get_serial_port(const char *path) {
 		close(fd);
 		return -1;
 	}
+
+	if ((flags = fcntl(fd, F_GETFL, 0)) == -1)
+		flags = 0;
+	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+
 	return fd;
 
 }
 
 
 static int _read_port(int fd, uint8_t *buff, int bytes) {
-	int i;
+	int i, iter = 0, t;
 
-	for (i = 0; i < bytes;)
-		i += read(fd, &buff[i], bytes - i);
+	for (i = 0; i < bytes && iter < 4; iter++) {
+		i += ((t = read(fd, &buff[i], bytes - i)) >= 0) ? t : 0;
+		//fprintf(stderr, "arne2 %i\n", i);
+		usleep(30000);
+	}
+
 	return i;
 }
 
 
-uint64_t tag_get_id(Tag *tag) {
-	int i;
+static void _do_transaction(Tag *tag, uint8_t *cmd, uint8_t *ret, uint8_t *ret_size) {
+	write(tag->serial_fd, cmd, cmd[1]);
+	memset(ret, 0, 258);
+	_read_port(tag->serial_fd, ret, 2);
+	_read_port(tag->serial_fd, ret + 2, ret[1] - 2);
+	*ret_size = ret[1];
+}
 
+
+struct StackThing {
+	uint8_t		*data;
+	int		max;
+	int		pos;
+};
+
+struct StackThing64 {
+	uint64_t	*data;
+	int		max;
+	int		pos;
+};
+
+
+static struct StackThing *_alloc_stack_thing(int max_size) {
+	struct StackThing *st;
+
+	st = malloc(sizeof(*st));
+	st->data = malloc(max_size);
+	st->pos = 0;
+	st->max = max_size;
+	return st;
+}
+
+static struct StackThing64 *_alloc_stack_thing64(int max_size) {
+	struct StackThing64 *st;
+
+	st = malloc(sizeof(*st) * sizeof(uint64_t));
+	st->data = malloc(max_size);
+	st->pos = 0;
+	st->max = max_size;
+	return st;
+}
+
+
+static void _calc_checksum(struct StackThing *st) {
+	int i;
+	uint8_t sum = 0;
+
+	st->data[1] = st->pos + 2;
+
+	for (i = 0; i < st->pos; i++)
+		sum ^= st->data[i];
+	st->data[st->pos++] = sum;
+	st->data[st->pos++] = ~sum;
+}
+
+
+static void _push_array(struct StackThing *st, uint8_t *arr, int size) {
+	int i;
+	for (i = 0; i < size; i++)
+		st->data[st->pos++] = arr[i];
+}
+
+
+int tag_get_id(Tag *tag, uint64_t tag_id[16]) {
+	int i, z, q = 0;
+	struct StackThing *cmd_st;
+	struct StackThing64 *mask_st;
+	uint8_t ret_size;
+	bool more_to_do = true;
+
+	uint8_t cmd_inventory[] = { 1, 0, 0, 0, 0, 0, 0x60, 0x11, 0x7, 0x1, 0 };
 	uint8_t cmd[] = { 1, 0, 0, 0, 0, 0, 0x60, 0x11, 0x7, 0x1, 0, /* ISO Inventory, no mask */
 			0, 0 };
 	
 	uint64_t id;
 	uint8_t chksm = 0, ret[258];
-	cmd[1] = sizeof(cmd);
-	for (i = 0; i < sizeof(cmd) - 2; i++)
-		chksm ^= cmd[i];
-	cmd[sizeof(cmd) - 2] = chksm;
-	cmd[sizeof(cmd) - 1] = ~chksm;
+	cmd_st = _alloc_stack_thing(256);
+	mask_st = _alloc_stack_thing64(256);
+	_push_array(cmd_st, cmd_inventory, sizeof(cmd_inventory));
+	_calc_checksum(cmd_st);
+	_do_transaction(tag, cmd_st->data, ret, &ret_size);
+	int mask_bytes = 0;
+	int tag_count = 0;
+	while (more_to_do) {
+		//fprintf(stderr, "arne\n");
+		if (ret[1] == 10 && ret[5] == 0x10) {
+			fprintf(stderr, "ERROR %i\n", ret[7]);
+			break;
+		}
 
-	write(tag->serial_fd, cmd, sizeof(cmd));
-	_read_port(tag->serial_fd, ret, 2);
-	_read_port(tag->serial_fd, ret + 2, ret[1] - 2);
-	if (ret[1] == 10 && ret[5] == 0x10)
-		return fprintf(stderr, "ERROR %i\n", ret[7]), 0;
-	if (!(ret[7] || ret[8]))
-		return fprintf(stderr, "No data\n"), 0;
+		if (ret[7] || ret[8]) {	// Data
+			for (z = 0; z < 8; z++) {
+				if (ret[7] & (0x1 << z))
+					tag_count++;
+				if (ret[8] & (0x1 << z))
+					tag_count++;
+			}
+
+			for (z = 0; z < tag_count; z++, q++) {
+				id = 0;
+				for (i = 0; i < 8; i++)
+					id |= (uint64_t) ret[13 + i + z*10] << (i * 8);
+				fprintf(stderr, "Tag %i: 0x%"PRIX64"\n", q, id);
+				tag_id[q] = id;
+			}
+		}
+
+
+		if (ret[9] || ret[10]) {
+			uint64_t time_slot;
+			for (z = 0; z < 8; z++) {
+				if (ret[9] & (1 << z)) {
+					mask_bytes = cmd_st->data[10] / 8;
+					for (i = 0; i < mask_bytes; i++)
+						mask_st->data[mask_st->pos++] = cmd_st->data[11 + i];
+					if (cmd_st->data[10] % 7) {
+						time_slot = z << 4;
+						time_slot |= cmd_st->data[11 + i];
+						mask_st->data[mask_st->pos++] = time_slot;
+					} else {
+						time_slot = z;
+						mask_st->data[mask_st->pos++] = time_slot;
+					}
+
+					mask_st->data[mask_st->pos++] = cmd_st->data[10] + 4;
+				}
+			}
+
+			if (cmd_st->data[10] & (1 << z)) {
+				mask_bytes = cmd_st->data[10] >> 3;
+				for (i = 0; i < mask_bytes; i++)
+					mask_st->data[mask_st->pos++] = cmd_st->data[11 + i];
+				if (cmd_st->data[10] & 7) {
+					time_slot = (z + 8) << 4;
+					time_slot |= cmd_st->data[11 + i];
+					mask_st->data[mask_st->pos++] = time_slot;
+				} else {
+					time_slot = z + 8;
+					mask_st->data[mask_st->pos++] = time_slot;
+				}
+				mask_st->data[mask_st->pos++] = cmd_st->data[10] + 4;
+			}
+		}
+
+		if (mask_st->pos) {
+			int mask_bits;
+			more_to_do = true;
+			cmd_st->pos = 0;
+			_push_array(cmd_st, cmd_inventory, sizeof(cmd_inventory) - 1);
+			cmd_st->data[cmd_st->pos++] = mask_st->data[--mask_st->pos];
+			mask_bits = mask_st->data[mask_st->pos];
+			
+			if (mask_bits == 64) {
+				fprintf(stderr, "Unresolved tag collisions (bad signal?\n");
+				return 0x0;
+			}
+
+			mask_bytes = mask_bits >> 3;
+			if (mask_bits & 0x7)
+				mask_bytes++;
+			for (i = -1 * mask_bytes; i < 0; i++)
+				cmd_st->data[cmd_st->pos++] = mask_st->data[--mask_st->pos];
+
+			_do_transaction(tag, cmd_st->data, ret, &ret_size);
+			_calc_checksum(cmd_st);
+		} else
+			more_to_do = false;
+	}
+
 	//if (ret[9] || ret[10])
 	//	return fprintf(stderr, "Collision!\n"), 0;
 	
-	for (i = 0; i < 8; i++)
-		id = (uint64_t) ret[13 + 8] << (i * 8);
-	return id;
+	return q;
 }
 
 
