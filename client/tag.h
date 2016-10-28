@@ -18,5 +18,6 @@ struct Tag {
 Tag *tag_init(const char *serial, uint64_t id, size_t averaging_samples);
 uint64_t tag_get_id(Tag *tag);
 double tag_get_angle(Tag *tag);
+double tag_get_temperature(Tag *tag);
 
 #endif

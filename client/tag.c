@@ -13,6 +13,7 @@
 #include <termios.h>
 #include <sys/types.h>
 #include <math.h>
+#include <limits.h>
 
 #include "tag.h"
 #include "trigonometry.h"
@@ -21,6 +22,9 @@
 #define ADDR_Y 0x2
 #define ADDR_Z 0x3
 #define ADDR_TEMP 0x1E
+
+#define TEMP_SCALE 2.42
+#define TEMP_OFFSET 646.
 
 static int _get_serial_port(const char *path) {
 	int fd;
@@ -163,6 +167,20 @@ double tag_get_angle(Tag *tag) {
 	//return atan2(xavg, yavg);
 	return trig_delta_to_angle_d(yavg, xavg);
 	//return atan2(xacc, yacc);
+}
+
+double tag_get_temperature(Tag *tag) {
+	uint16_t tmp;
+	double temperature;
+	if((tmp = _read_block(ADDR_TEMP, tag->serial_fd, tag->id)) == 1)
+		return HUGE_VAL;
+	tmp >>= 6;
+	
+	printf("Raw: %hu\n", tmp);
+	temperature = tmp;
+	temperature = (TEMP_OFFSET - temperature)/TEMP_SCALE;
+	
+	return temperature;
 }
 
 Tag *tag_init(const char *serial, uint64_t id, size_t averaging_samples) {
