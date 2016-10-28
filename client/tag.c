@@ -65,10 +65,10 @@ static int _get_serial_port(const char *path) {
 static int _read_port(int fd, uint8_t *buff, int bytes) {
 	int i, iter = 0, t;
 
-	for (i = 0; i < bytes && iter < 4; iter++) {
+	for (i = 0; i < bytes && iter < 120; iter++) {
 		i += ((t = read(fd, &buff[i], bytes - i)) >= 0) ? t : 0;
 		//fprintf(stderr, "arne2 %i\n", i);
-		usleep(30000);
+		usleep(1000);
 	}
 
 	return i;
