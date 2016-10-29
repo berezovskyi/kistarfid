@@ -3,6 +3,9 @@
 *.blg
 *.aux
 *.log
+*.bbl
+*.toc
+
 *.pdf
 
 *.swp
