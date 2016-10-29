@@ -1,4 +1,4 @@
-update=2016 October 27, Thursday 19:54:14
+update=lör 29 okt 2016 17:00:38
 version=1
 last_client=kicad
 [pcbnew]
@@ -25,6 +25,16 @@ version=1
 NetIExt=net
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=
+SpiceAjustPassiveValues=0
+LabSize=60
+ERC_TestSimilarLabels=1
 [eeschema]
 version=1
 LibDir=
@@ -59,13 +69,4 @@ LibName27=atmel
 LibName28=contrib
 LibName29=valves
 LibName30=pic12
-[schematic_editor]
-version=1
-PageLayoutDescrFile=
-PlotDirectoryName=
-SubpartIdSeparator=0
-SubpartFirstId=65
-NetFmtName=
-SpiceAjustPassiveValues=0
-LabSize=60
-ERC_TestSimilarLabels=1
+LibName31=accelerometer
