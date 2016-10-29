@@ -2,6 +2,9 @@
 /datasheets/
 *.aux
 *.log
+*.bbl
+*.toc
+
 *.pdf
 
 *.swp
