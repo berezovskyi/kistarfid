@@ -1,0 +1,119 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage{polyglossia}
+\setmainlanguage{english}
+\setotherlanguage{swedish}
+\usepackage{color}
+\usepackage[parfill]{parskip}
+\usepackage{siunitx}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{verbatim}
+\usepackage{fancyvrb}
+\usepackage{geometry}
+\usepackage{tocloft}
+\usepackage{fontspec}
+\usepackage[numbers,square,super]{natbib}
+\usepackage[numbib]{tocbibind}
+%\usepackage{mathtools}
+\usepackage[table]{xcolor}
+\usepackage{soul}
+\usepackage{nameref}
+%\usepackage[addtotoc]{abstract}
+%\usepackage[hyphens]{url}
+\usepackage[bookmarks]{hyperref}
+\usepackage[all]{hypcap}
+\usepackage[hypcap]{caption}
+%\usepackage[toc, page]{appendix}
+\usepackage{pdfpages}
+
+\cftsetindents{section}{0cm}{2cm}
+\cftsetindents{subsection}{2cm}{1cm}
+\cftsetindents{subsubsection}{3cm}{1cm}
+%\cftsetindents{paragraph}{1.5cm}{0.5cm}
+
+\makeatletter
+\renewcommand\NAT@citesuper[3]{\ifNAT@swa
+\if*#2*\else#2\NAT@spacechar\fi
+\unskip\kern\p@\textsuperscript{\NAT@@open#1\if*#3*\else,\NAT@spacechar#3\fi\NAT@@close}%
+   \else #1\fi\endgroup}
+\makeatother
+
+
+\let\strong\textbf 
+
+\definecolor{ltblue}{rgb}{0.93,0.95,1.0}
+\definecolor{dkblue}{rgb}{0,0,0.5}
+\definecolor{dkyellow}{rgb}{0.5,0.5,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{ltgray}{rgb}{0.9,0.9,0.9}
+\definecolor{dkgreen}{rgb}{0,0.5,0}
+\definecolor{dkmagenta}{rgb}{0.5,0,0.5}
+
+\sethlcolor{ltgray}
+
+\lstset{language=C}
+\lstset{ %
+    backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+    basicstyle=\scriptsize\ttfamily,        % the size of the fonts that are used for the code
+    breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+    breaklines=true,                 % sets automatic line breaking
+    captionpos=b,                    % sets the caption-position to bottom
+    commentstyle=\color{dkgreen},    % comment style
+    deletekeywords={},               % if you want to delete keywords from the given language
+    escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+    extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+    frame=none,                      % adds a frame around the code
+    keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+    keywordstyle=\bfseries\color{dkblue},       % keyword style
+    %identifierstyle=\color{dkyellow},
+    directivestyle=\color{dkyellow},
+    morekeywords={*,...},            % if you want to add more keywords to the set
+    numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+    numbersep=5pt,                   % how far the line-numbers are from the code
+    numberstyle=\tiny\color{gray},   % the style that is used for the line-numbers
+    rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+    showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+    showstringspaces=false,          % underline spaces within strings only
+    showtabs=false,                  % show tabs within strings adding particular underscores
+    stepnumber=1,                    % the step between two line-numbers. If it's 1, each line will be numbered
+    stringstyle=\color{dkmagenta},       % string literal style
+    tabsize=4,                       % sets default tabsize to 2 spaces
+    title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\hypersetup{
+    pdftitle={\doctitle},
+    pdfauthor={\docauthor},
+    pdfsubject={\docsubject},
+    colorlinks=true,
+    urlcolor=dkblue,
+    linkcolor=black,
+    citecolor=black,
+    unicode=true,
+}
+
+\newfloat{source}{tbp}{ext}
+\floatname{source}{Source code listing}
+
+\patchcmd{\bibliography}{\section*}{\section}{}{}
+\newcommand{\fig}[1]{\hyperref[fig:#1]{Figur \ref*{fig:#1}}}
+\newcommand{\tab}[1]{\hyperref[tab:#1]{Tabell \ref*{tab:#1}}}
+\newcommand{\src}[1]{\hyperref[src:#1]{Källkodsexempel \ref*{src:#1}}}
+\newcommand{\term}[1]{\hyperref[term:#1]{#1}}
+\newcommand{\defterm}[1]{\strong{#1}\label{term:#1}}
+
+% New definition of square root:
+% it renames \sqrt as \oldsqrt
+\let\oldsqrt\sqrt
+% it defines the new \sqrt in terms of the old one
+\def\sqrt{\mathpalette\DHLhksqrt}
+\def\DHLhksqrt#1#2{%
+\setbox0=\hbox{$#1\oldsqrt{#2\,}$}\dimen0=\ht0
+\advance\dimen0-0.2\ht0
+\setbox2=\hbox{\vrule height\ht0 depth -\dimen0}%
+{\box0\lower0.4pt\box2}}
+
+%\renewcommand{\figurename}{Tabell }
+\rowcolors{1}{white}{ltblue} % odd = white, even = lightblue
+
