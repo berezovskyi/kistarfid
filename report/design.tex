@@ -9,12 +9,18 @@
 The antenna was designed as an LC tank circuit.
 The inductor was created as a trace on the printed circuit board, the outer width and hight the same size as a credit card.
 
+%The antenna design was based on the envelope detector described in a Ti antenna design application note [cite?].
+%The size of the antenna was enlarged to credit-card size and and the number of turns of the PCB antenna was
+%reduced from 4 to 3, with the reasoning that it should reduce the inductance, which in turn should make
+%for lower a lower induced voltage and a higer induced current.
+
 The inductor was first estimated [...]
 After the printed circuit board had been created, the inductance of the antenna was measured with and LCR meter.
-The measured inductance was 1.0 µH.
+The measured inductance was 1.0 µH, with a Q-value of 0.008 at 10 kHz.
 
 A tuning capacitor was calculated for the antenna resonant frequency of 13.56 MHz.
-[...]
+At first, 133 pF of capacitance was added (one 100 pF capacitor, one 33 pF capacitor) and a 3 pF - 14 pF adjustable capacitor. The
+adjustable capacitor was later replaced with a 10 pF capacitor for a final tuning value of 143 pF.
 
 \subsubsection{Demodulation Circuitry}
 For demodulating the incoming signal, a simple diode-capacitor-resistor based AM detector circuit was selected.
@@ -55,8 +61,8 @@ should be able to do any standard type of CRC up to CRC16, which is good since t
 implemented for RFID communication calls for a CRC16 checksum in every reply from the tag.
 
 For the most part, configuring the CRC computation accelerator is mainly a case of loading the
-CRC polynomial and a half-dozen parameter for things like bit shifting direction, whether or not to pad
-out with zeroes when shifting seed and starting values, which are all given in the ISO standard.
+CRC polynomial and a half-dozen parameters for things like bit shifting direction, whether or not to pad
+out with zeroes when shifting, seed and starting values, which are all given in the ISO standard.
 While the shifting direction can be set, the CRC
 accelerator does not implement the lowest bit of the CRC polynomial, as any standard polynomial will always have
 this bit set. As a result, the CRC accelerator inside the microcontroller cannot do reverse polynomials.
