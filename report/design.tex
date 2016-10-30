@@ -47,6 +47,28 @@ The modulation transistor is driven by an output pin of the microcontroller.
 \subsection{Software}
 
 \subsubsection{Command decoding}
+The command decoding that was implemented in the tag is a subset of the standard. Specifically, the
+1-in-4 symbol encoding was implemented, as that's what the reader used during testing used.
+
+Command decoding is initiated when the AM detector triggers an interrupt. Inside the interrupt handler,
+a free-running timer is started with the same reset-rate as the symbol rate (1 symbol = 2 bits in 1-in-4 mode)
+of the bitstream. A free-running timer was chosen as it is very important to keep the timer in sync with
+the transmitter, or drift would eventually lead to corrupted data at the receive end. A hardware
+reset on the timer avoid software latency.
+
+If a second pulse within the first symbol arrives at the correct time for a start of frame, the state is
+changed to byte recieve mode.
+
+The interrupt is triggered every time the AM detector a modulated pulse. The interrupt handler then
+saves the current counter state. Every time the timer resets, the main loop reads and resets the saved timer
+value. The timer value is converted to a 2-byte symbol which is successively shifted into full bytes.
+
+The ISO specification used does specify an end-of-frame symbol. This implementation does not use
+the EOF symbol, instead, a symbol with no modulation pulse is used as an EOF marker.
+When an end of frame is detected the command is decoded by using the second byte of the received command.
+From this byte, a specialized handler function is called, which will parse and encode a result.
+
+
 \subsubsection{CRC generation}
 While CRC (a type of checksum) is designed to be reasonably quick to calculate in software,
 a slow microcontroller will still struggle a bit to do it quickly. The microcontroller used in this
@@ -72,3 +94,24 @@ can be trivially performed by the microcontroller.
 
 
 \subsubsection{Response encoding}
+
+%%% Not sure where this should go
+%As part of the Inventory command, which is for detecting how many tags are within the reader's range,
+%and thier ID numbers, a special collision handling scheme is used. This enables the reader to
+%only get replies from certian tags when it thinks multiple tags are replying simultaniously.
+%The implementation described in this document does not handle the collision handling fully.
+%Specifically, the mask is ignored. Time-slotting is technically not implemented, but as a work-around,
+%the lowest 4 bits of the ID was chosen as 0. As a result, the tag will respond in the correct time-slot
+%as long as the mask is 0.
+
+%As for the Read Block command, the tag ID field is currently not implemented, the tag will
+%reply to any read block command it sees. The address field is however implemented.
+%THe Read Block handler will use the address field to select an input for the ADC converter inside
+%the microcontrolller. For example, address 0 would be external analog input pin 0, and address 30 would
+%be the internal temperature sensor. Whenever a read block command is handled, the corresponding
+%analog input is selected and conversion is started. Whenever the ADC has finished converting the analog
+%value into a digital one, the data is filled into a response template.
+%
+%Regardless of command, whenever the data is modulated out, the CRC is first calculated as per the section
+%below. The reply is kept in a buffer in RAM. However, due to timing concerns, there is one transmit function per
+%response length, containing only an unrolled loop with calls to helpers that m
