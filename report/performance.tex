@@ -1,0 +1,47 @@
+\section{Performance}
+
+As the developed tag is mostly in a stage of experimentation platform, a few parameters of its performance
+was measured, mainly power consumption and reading distance. The reading distance was also compared to a
+simple, commercial ISO 15693-2 (same standard as implemented in our experimental platform) tag. Specifically our
+KTH library cards. Both the constructed tag and the experimental tag were tested using the same software with
+the same 1/8 Watt reader using the same antenna.
+
+\subsection{Reading Distance}
+The reference point used, a commercial ISO 15693-2 tag, could reliably be read from 117 mm right above the
+antenna, but any further than that would reliably fail. The tests where done holding the tag above the reader
+antenna against a scale with only air between the antenna and the tag.
+
+The constructed tag could with some difficulty be read at up to 7 mm, significantly shorter shorter than
+the reference tag used. The data in table \ref{tab:readdistance} shows the time taken to read the tag at various distances.
+The tag was read 5 times in rapid succession at each distance. For comparison, all successful reads against
+the reference tag always took ≈ 330 ms.
+
+\begin{figure}
+\centering
+\label{tab:readdistance}
+\begin{tabular}{| l | r | r | r | r | r |}
+	\hline
+	Distance & Read 1 & Read 2 & Read 3 & Read 4 & Read 5 \\ \hline
+	0 mm & 365 ms & 665 ms & 336 ms & 351 ms & 351 ms \\ \hline
+	1 mm & 685 ms & 671 ms & 669 ms & 669 ms & 339 ms \\ \hline
+	2 mm & 1013 ms & 350 ms & 347 ms & 353 ms & 677 ms \\ \hline
+	3 mm & 689 ms & 685 ms & 670 ms & 346 ms & 346 ms \\ \hline
+	4 mm & 355 ms & 347 ms & 681 ms & 679 ms & 345 ms \\ \hline
+	5 mm & 356 ms & 345 ms & 350 ms & 669 ms & 671 ms \\ \hline
+	6 mm & 357 ms & 339 ms & 667 ms & 667 ms & 676 ms \\ \hline
+	7 mm & 1352 ms & FAIL & 2680 ms & 2343 ms & 2669 ms \\ \hline
+	8 mm & FAIL & FAIL & FAIL & FAIL & FAIL \\ \hline
+\end{tabular}
+\caption{Read times versus distance from antenna}
+\end{figure}
+
+\subsection{Power Consumption}
+Power consumption for the design was done by measuring the voltage over the energy storage capacitor
+while reading the tag, and while measuring the current through the main rectifying diode.
+At the furthest readable distance, 7 mm, the measured power consumption was 8.8 mA at 2.6 Volts (lowest peak while replying),
+and about 10 mA at 3.1 Volts nominal. This places the power consumption somewhere between 22.8 mW and 31 mW. With the
+accelerometer mounted to the tag specified at about 1.5 mW, the largest power consumers are likely the microcontroller and the
+overvoltage protection zener diode.
+
+When the tag is nudged out of range, the voltage does stay above the 2.2 volts required by the accelerometer
+and the 1.8 volts required by the microcontroller, suggesting the design is back-link limited.
