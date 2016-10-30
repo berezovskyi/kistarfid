@@ -1,26 +1,43 @@
 \section{Design}
 
+The full  hardware and software design is published on Github\footnote{\url{https://github.com/berezovskyi/kistarfid}}.
+
 \subsection{Hardware}
 
 \subsubsection{Microcontroller}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=1.0]{res/schematic-pic.eps}
+    \caption{Hardware schematic of the microcontroller}
+    \label{fig:sch-pic}
+\end{figure}
+
 \subsubsection{Accelerometer}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=1.0]{res/schematic-acc.eps}
+    \caption{Hardware schematic of the accelerometer}
+    \label{fig:sch-acc}
+\end{figure}
 
 \subsubsection{Antenna}
-The antenna was designed as an LC tank circuit.
-The inductor was created as a trace on the printed circuit board, the outer width and hight the same size as a credit card.
+The antenna design was based on the envelope detector described in a Ti antenna design application note\cite{ti-antenna}.
+The size of the antenna was enlarged to credit-card size and and the number of turns of the antenna coils were reduced from 4 to 3, with the reasoning that it should reduce the inductance, which in turn should make for lower a lower induced voltage and a higer induced current.
+The inductor was realized as a trace on the printed circuit board that was designed for the project.
 
-%The antenna design was based on the envelope detector described in a Ti antenna design application note [cite?].
-%The size of the antenna was enlarged to credit-card size and and the number of turns of the PCB antenna was
-%reduced from 4 to 3, with the reasoning that it should reduce the inductance, which in turn should make
-%for lower a lower induced voltage and a higer induced current.
-
-The inductor was first estimated [...]
 After the printed circuit board had been created, the inductance of the antenna was measured with and LCR meter.
 The measured inductance was 1.0 µH, with a Q-value of 0.008 at 10 kHz.
 
 A tuning capacitor was calculated for the antenna resonant frequency of 13.56 MHz.
 At first, 133 pF of capacitance was added (one 100 pF capacitor, one 33 pF capacitor) and a 3 pF - 14 pF adjustable capacitor. The
 adjustable capacitor was later replaced with a 10 pF capacitor for a final tuning value of 143 pF.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=1.0]{res/schematic-antenna.eps}
+    \caption{Hardware schematic of the antenna, modulation and demodulation circuits}
+    \label{fig:sch-antenna}
+\end{figure}
 
 \subsubsection{Demodulation Circuitry}
 For demodulating the incoming signal, a simple diode-capacitor-resistor based AM detector circuit was selected.
@@ -74,6 +91,12 @@ the EOF symbol, instead, a symbol with no modulation pulse is used as an EOF mar
 When an end of frame is detected the command is decoded by using the second byte of the received command.
 From this byte, a specialized handler function is called, which will parse and encode a result.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{res/RX.pdf}
+    \caption{Command decoding in the microcontroller}
+    \label{fig:rx}
+\end{figure}
 
 \subsubsection{CRC generation}
 While CRC (a type of checksum) is designed to be reasonably quick to calculate in software,
@@ -117,6 +140,12 @@ To solve this problem and generate frequencies closer to the correct subcarrier 
 CCP Dividers of 7 and 8 was chosen instead of 8 and 9 to get the spacing of the subcarriers from eachother correct and the system oscillator was tuned down to the lowest possible setting.
 This yielded frequencies of 480.8 kHz and 431 kHz, which was close enough to the standard to work.
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{res/TX.pdf}
+    \caption{Response encoding in the microcontroller}
+    \label{fig:tx}
+\end{figure}
 
 %%% Not sure where this should go
 %As part of the Inventory command, which is for detecting how many tags are within the reader's range,

@@ -6,8 +6,7 @@
 *.bbl
 *.toc
 
-*.pdf
-
+/report/final_report.pdf
 *.swp
 *.out
 /sw/crc
