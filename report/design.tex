@@ -18,8 +18,8 @@ should be able to do any standard type of CRC up to CRC16, which is good since t
 implemented for RFID communication calls for a CRC16 checksum in every reply from the tag.
 
 For the most part, configuring the CRC computation accelerator is mainly a case of loading the
-CRC polynomial and a half-dozen parameter for things like bit shifting direction, whether or not to pad
-out with zeroes when shifting seed and starting values, which are all given in the ISO standard.
+CRC polynomial and a half-dozen parameters for things like bit shifting direction, whether or not to pad
+out with zeroes when shifting, seed and starting values, which are all given in the ISO standard.
 While the shifting direction can be set, the CRC
 accelerator does not implement the lowest bit of the CRC polynomial, as any standard polynomial will always have
 this bit set. As a result, the CRC accelerator inside the microcontroller cannot do reverse polynomials.
