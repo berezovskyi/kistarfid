@@ -78,3 +78,19 @@ can be trivially performed by the microcontroller.
 
 
 \subsubsection{Response encoding}
+The ISO-15693 standard allows for two different ways of transmitting the response: single subcarrier or dual subcarrier.\cite{rfid-iso}
+The reader determines which method to use.
+
+It was discovered that the readers in the lab, Texas instrument S6350, requested that the response should use two subcarriers.
+This meant that the tag had to be able to generate the frequencies 423.75 kHz and 484.28 kHz, and quickly switch between the two to generate a series of bits that make up the response.
+
+Since the subcarrier frequencies are of fairly high frequency and close together, generating them from the microcontroller proved to be difficult.
+Different methods were investigated, including several of the microcontroller's internal peripherals, such as the \emph{Complimentary Waveform Generator} and the \emph{Capture, Compare and PWM} peripheral. External oscillator circuits were also considered, but discarded due to either prohibitive power consumption or cost.
+
+The final solution used the \emph{Capture, Compare and PWM} (CCP) microcontroller peripheral.
+Due to restrictions in the microcontroller, the timer peripheral driving the CCP could only run at highest at 8 MHz, toggling the output on each timer compare match.
+The closest synthesizable frequencies with this setup are $\frac{\frac{8 MHz}{2}}{8} = 500 kHz$ and $\frac{\frac{8 MHz}{2}}{9} = 444 kHz$.
+
+To solve this problem and generate frequencies closer to the correct subcarrier frequences, the entire microcontroller system oscillator from which all frequencies were derived, was de-tuned.
+CCP Dividers of 7 and 8 was chosen instead of 8 and 9 to get the spacing of the subcarriers from eachother correct and the system oscillator was tuned down to the lowest possible setting.
+This yielded frequencies of 480.8 kHz and 431 kHz, which was close enough to the standard to work.
