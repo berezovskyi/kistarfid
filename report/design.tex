@@ -36,7 +36,13 @@ With the diode added, the modulation is only performed during half of the duty c
 The modulation transistor is driven by an output pin of the microcontroller.
 
 \subsubsection{Energy harvester}
+The energy harvester was designed as a half-wave rectifier, using a shottky diode.
+The shottky diode was selected for its high speed and low forward voltage drop.
+High speed is important in the application since the signal being rectified is the carrier wave at 13.56 MHz.
+Low forward voltage is important since low power consumption is critical for the application.
+Low forward voltage means less energy is wasted in the diode.
 
+A 22 µF tantalum capacitor, a 100 nF ceramic capacitor and a 3.3 V zener diode was added to filter and regulate the voltage supply.
 
 \subsection{Software}
 
