@@ -5,6 +5,9 @@ The full  hardware and software design is published on Github\footnote{\url{http
 \subsection{Hardware}
 
 \subsubsection{Microcontroller}
+The microcontroller chosen for the project, PIC12LF1612 is a low power microcontroller with internal peripherals for interfacing with analog signals, such as analog-to-digital converter, digital-to-analog converter, analog comparator, internal voltage reference, etc\cite{pic}.
+The microcontroller was chosen because of these properties and also because we had one avaible.
+
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=1.0]{res/schematic-pic.eps}
@@ -13,6 +16,10 @@ The full  hardware and software design is published on Github\footnote{\url{http
 \end{figure}
 
 \subsubsection{Accelerometer}
+An accelerometer was connected to the microcontroller to be able to determine the orientation of the tag when held up to a reader.
+An analog accelerometer was specifically selected since the PIC12LF1612 lacks serial (SPI/I²C) capability.
+The accelerometer MMA7260QT was selected simply due to availability and was connected to the microcontroller through a filtering circuit, as specified in the datasheet\cite{mma-acc}
+
 \begin{figure}[h!]
     \centering
     \includegraphics[scale=1.0]{res/schematic-acc.eps}
