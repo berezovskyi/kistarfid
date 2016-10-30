@@ -1,0 +1,24 @@
+Our tag:
+0mm: 0m0.365s, 0m0.665s, 0m0.336s, 0m0.351s, 0m0.351s
+1mm: 0m0.685s, 0m0.671s, 0m0.669s, 0m0.669s, 0m0.339s
+2mm: 0m1.013s, 0m0.350s, 0m0.347s, 0m0.353s, 0m0.677s
+3mm: 0m0.689s, 0m0.685s, 0m0.670s, 0m0.346s, 0m0.346s
+4mm: 0m0.355s, 0m0.347s, 0m0.681s, 0m0.679s, 0m0.345s
+5mm: 0m0.356s, 0m0.345s, 0m0.350s, 0m0.669s, 0m0.671s
+6mm: 0m0.357s, 0m0.339s, 0m0.667s, 0m0.667s, 0m0.676s
+7mm: 0m1.352s, 0m2.680s, 0m2.343s, 0m2.669s
+8mm: 1
+
+Library card:
+
+
+Max: 117 mm reliably, not at all just a smidgeon higher, entierly reliable below
+
+
+Generating: 480.8 kHz, 431 kHz
+
+22 mm -> 2.0 volts
+0mm -> 3.2 volts
+7mm -> 3.1 volts, reading: 2.7 volts (later 2.6v?) about 8.8 mA when reading replies aren't recieved
+
+Backlink limited?
