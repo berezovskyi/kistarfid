@@ -42,4 +42,27 @@ The modulation transistor is driven by an output pin of the microcontroller.
 
 \subsubsection{Command decoding}
 \subsubsection{CRC generation}
+While CRC (a type of checksum) is designed to be reasonably quick to calculate in software,
+a slow microcontroller will still struggle a bit to do it quickly. The microcontroller used in this
+tag has a built-in accelerator for CRC computation. On paper, the CRC hardware inside the microcontroller
+should be able to do any standard type of CRC up to CRC16, which is good since the ISO standard
+implemented for RFID communication calls for a CRC16 checksum in every reply from the tag.
+
+For the most part, configuring the CRC computation accelerator is mainly a case of loading the
+CRC polynomial and a half-dozen parameter for things like bit shifting direction, whether or not to pad
+out with zeroes when shifting seed and starting values, which are all given in the ISO standard.
+While the shifting direction can be set, the CRC
+accelerator does not implement the lowest bit of the CRC polynomial, as any standard polynomial will always have
+this bit set. As a result, the CRC accelerator inside the microcontroller cannot do reverse polynomials.
+The ISO standard implemented in the tag for RFID communication requires a reverse polynomial CRC.
+
+As a work-around, the polynomial provided by the ISO standard was reversed, and so was the bit shifting
+direction as compared to what was called for in the ISO standard. The result is a correctly calculated
+CRC, with exception for the bit order, which is completely reversed. A simple work-around for this is to
+just shift out the bits in the opposite direction when modulating the reply, or to reverse the bits
+in software before transmitting them. The latter is what ended up in the design. Additionally, the ISO standard
+calls for the CRC to be transmitted as a one's complement of the calculted CRC, but this operation
+can be trivially performed by the microcontroller.
+
+
 \subsubsection{Response encoding}
