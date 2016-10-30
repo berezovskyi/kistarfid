@@ -4,7 +4,7 @@ NAME=final_report
 
 all:
 	xelatex $(NAME).tex
-	#bibtex $(NAME).aux
+	bibtex $(NAME).aux
 	xelatex $(NAME).tex
 	xelatex $(NAME).tex
 

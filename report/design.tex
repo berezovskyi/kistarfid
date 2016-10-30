@@ -4,8 +4,39 @@
 
 \subsubsection{Microcontroller}
 \subsubsection{Accelerometer}
+
+\subsubsection{Antenna}
+The antenna was designed as an LC tank circuit.
+The inductor was created as a trace on the printed circuit board, the outer width and hight the same size as a credit card.
+
+The inductor was first estimated [...]
+After the printed circuit board had been created, the inductance of the antenna was measured with and LCR meter.
+The measured inductance was 1.0 µH.
+
+A tuning capacitor was calculated for the antenna resonant frequency of 13.56 MHz.
+[...]
+
+\subsubsection{Demodulation Circuitry}
+For demodulating the incoming signal, a simple diode-capacitor-resistor based AM detector circuit was selected.
+This circuit forms an envelope detector and low pass filter that will filter out the carrier wave and present the modulation wave on the input of the microcontroller.
+
+The filter was initially set around 100 kHz to allow the 10 µs modulation pulses\cite{rfid-iso} through.
+This however proved to be inadequate when analysing the signal using an oscilloscope.
+The final filter was set around 450 kHz, with component values of 22 pF and 100 kΩ.
+
+A 3.3V zener diode was added to the circuit to protect the microcontroller from high voltages.
+
+\subsubsection{Modulation Circuitry}
+For modulating the output signal, a diode in series with an N-channel mosfet, connected across the antenna, was used.
+
+Initially, the diode was not present in the design.
+This however caused serious problems, since the body diode of the transistor effectively short-circuited the antenna during half the duty cycle of the carrier wave.
+With the diode added, the modulation is only performed during half of the duty cycle of the carrier wave, providing a weaker backscattered signal to the reader but was agreed upon as an acceptable compromise.
+
+The modulation transistor is driven by an output pin of the microcontroller.
+
 \subsubsection{Energy harvester}
-\subsubsection{Radio circuitry}
+
 
 \subsection{Software}
 
