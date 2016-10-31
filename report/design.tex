@@ -83,6 +83,8 @@ Low forward voltage means less energy is wasted in the diode.
 A 22 µF tantalum capacitor, a 100 nF ceramic capacitor and a 3.3 V zener diode was added to filter and regulate the voltage supply.
 
 \subsection{Software}
+The software implemented in the microcontroller is fairly simple, and is mostly setting up the various built-in
+periphials with some very basic flow control. There's three main steps involved, described below.
 
 \subsubsection{Command decoding}
 The command decoding that was implemented in the tag is a subset of the standard. Specifically, the
