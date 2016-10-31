@@ -89,18 +89,18 @@ periphials with some very basic flow control. There's three main steps involved,
 
 \subsubsection{Command decoding}
 The command decoding that was implemented in the tag is a subset of the standard. Specifically, the
-1-in-4 symbol encoding was implemented, as that's what the reader used during testing used.
+1-in-4 symbol encoding was implemented, as that's what the reader used during testing.
 
-Command decoding is initiated when the AM detector triggers an interrupt. Inside the interrupt handler,
+Command decoding is initiated when the comparator (part of the AM detector) triggers an interrupt. Inside the interrupt handler,
 a free-running timer is started with the same reset-rate as the symbol rate (1 symbol = 2 bits in 1-in-4 mode)
 of the bitstream. A free-running timer was chosen as it is very important to keep the timer in sync with
 the transmitter, or drift would eventually lead to corrupted data at the receive end. A hardware
 reset on the timer avoid software latency.
 
 If a second pulse within the first symbol arrives at the correct time for a start of frame, the state is
-changed to byte recieve mode.
+changed from idle to byte recieve mode.
 
-The interrupt is triggered every time the AM detector a modulated pulse. The interrupt handler then
+The interrupt is triggered every time the comparator (part of the AM detector) detects a modulated pulse. The interrupt handler then
 saves the current counter state. Every time the timer resets, the main loop reads and resets the saved timer
 value. The timer value is converted to a 2-byte symbol which is successively shifted into full bytes.
 
